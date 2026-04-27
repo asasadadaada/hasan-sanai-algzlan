@@ -19,7 +19,7 @@ function CustomerForm({ initial, onClose, onSaved }) {
   };
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
-      <div className="bg-card border border-border rounded-lg w-full max-w-md p-5" onClick={(e) => e.stopPropagation()} data-testid="customer-form">
+      <div className="bg-card border border-border rounded-2xl w-full max-w-md p-5" onClick={(e) => e.stopPropagation()} data-testid="customer-form">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-semibold">{initial?.id ? t("edit") : t("add")}</h3>
           <button onClick={onClose}><X className="w-4 h-4" /></button>
@@ -27,19 +27,19 @@ function CustomerForm({ initial, onClose, onSaved }) {
         <form onSubmit={submit} className="space-y-3">
           <div>
             <label className="text-xs font-medium mb-1.5 block">{t("name")}</label>
-            <input data-testid="c-name" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full h-10 px-3 rounded-xl border border-border bg-transparent text-sm" />
+            <input data-testid="c-name" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="premium-input" />
           </div>
           <div>
             <label className="text-xs font-medium mb-1.5 block">{t("phone")}</label>
-            <input data-testid="c-phone" required value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="w-full h-10 px-3 rounded-xl border border-border bg-transparent text-sm" />
+            <input data-testid="c-phone" required value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="premium-input" />
           </div>
           <div>
             <label className="text-xs font-medium mb-1.5 block">{t("notes")}</label>
-            <textarea data-testid="c-notes" value={form.notes || ""} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="w-full min-h-[60px] px-3 py-2 rounded-xl border border-border bg-transparent text-sm" />
+            <textarea data-testid="c-notes" value={form.notes || ""} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="premium-input" />
           </div>
           <div className="flex justify-end gap-2">
-            <button type="button" onClick={onClose} className="h-9 px-4 rounded-xl border border-border text-sm">{t("cancel")}</button>
-            <button type="submit" data-testid="c-submit" disabled={saving} className="h-9 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-medium">{t("save")}</button>
+            <button type="button" onClick={onClose} className="btn-outline h-9">{t("cancel")}</button>
+            <button type="submit" data-testid="c-submit" disabled={saving} className="btn-primary h-9">{t("save")}</button>
           </div>
         </form>
       </div>
@@ -81,7 +81,7 @@ export default function Customers() {
       </div>
       <div className="relative max-w-md">
         <Search className="w-4 h-4 absolute top-2.5 start-3 text-muted-foreground" />
-        <input data-testid="customer-search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("search")} className="w-full h-9 ps-9 pe-3 rounded-xl border border-border bg-transparent text-sm" />
+        <input data-testid="customer-search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("search")} className="premium-input h-9 ps-9" />
       </div>
       <div className="swiss-card overflow-x-auto">
         <table className="data-table">
@@ -98,8 +98,8 @@ export default function Customers() {
                 <td className="text-xs text-muted-foreground max-w-[220px] truncate">{c.notes || "—"}</td>
                 <td>
                   <div className="flex justify-end gap-1">
-                    <button onClick={() => setEditing(c)} data-testid={`edit-customer-${c.id}`} className="p-1.5 rounded hover:bg-muted"><Edit className="w-4 h-4" /></button>
-                    <button onClick={() => del(c)} data-testid={`delete-customer-${c.id}`} className="p-1.5 rounded hover:bg-destructive/10 text-destructive"><Trash2 className="w-4 h-4" /></button>
+                    <button onClick={() => setEditing(c)} data-testid={`edit-customer-${c.id}`} className="p-1.5 rounded-lg hover:bg-muted press transition-colors"><Edit className="w-4 h-4" /></button>
+                    <button onClick={() => del(c)} data-testid={`delete-customer-${c.id}`} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive press transition-colors"><Trash2 className="w-4 h-4" /></button>
                   </div>
                 </td>
               </tr>

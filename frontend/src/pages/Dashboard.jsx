@@ -8,9 +8,9 @@ import { Link } from "react-router-dom";
 import { api, fmtMoney } from "@/lib/api";
 import { useApp } from "@/contexts/AppContext";
 
-function KPI({ icon: Icon, label, value, hint, gradient, testId }) {
-  return (
-    <div className="kpi-card group" data-testid={testId}>
+function KPI({ icon: Icon, label, value, hint, gradient, testId, to }) {
+  const inner = (
+    <>
       <div className="flex items-center justify-between mb-4">
         <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center text-white shadow-md transition-transform duration-200 group-hover:scale-110`}>
           <Icon className="w-5 h-5" strokeWidth={2} />
@@ -20,8 +20,16 @@ function KPI({ icon: Icon, label, value, hint, gradient, testId }) {
       <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">{label}</div>
       <div className="text-2xl font-bold tabular mt-1 tracking-tight">{value}</div>
       {hint && <div className="text-xs text-muted-foreground mt-1.5">{hint}</div>}
-    </div>
+    </>
   );
+  if (to) {
+    return (
+      <Link to={to} data-testid={testId} className="kpi-card group cursor-pointer block text-start hover:border-primary/30">
+        {inner}
+      </Link>
+    );
+  }
+  return (<div className="kpi-card group" data-testid={testId}>{inner}</div>);
 }
 
 export default function Dashboard() {
@@ -69,14 +77,14 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 stagger">
-        <KPI testId="kpi-customers" icon={Users} label={t("kpi_customers")} value={stats.customers_count} gradient="from-teal-500 to-emerald-600" />
-        <KPI testId="kpi-active" icon={Wrench} label={t("kpi_active_maint")} value={stats.maint_active} hint={`${stats.maint_total} ${t("total").toLowerCase()}`} gradient="from-sky-500 to-blue-600" />
-        <KPI testId="kpi-debt" icon={Banknote} label={t("kpi_debt_total")} value={fmtMoney(stats.debt_total, cur, lang)} hint={`${stats.open_debts_count} ${t("kpi_open_debts")}`} gradient="from-amber-500 to-orange-600" />
-        <KPI testId="kpi-profit" icon={TrendingUp} label={t("kpi_profit_total")} value={fmtMoney(stats.profit_total, cur, lang)} gradient="from-emerald-500 to-green-600" />
-        <KPI testId="kpi-profit-month" icon={CircleDollarSign} label={t("kpi_profit_month")} value={fmtMoney(stats.profit_month, cur, lang)} hint={fmtMoney(stats.revenue_month, cur, lang) + " " + t("revenue").toLowerCase()} gradient="from-indigo-500 to-purple-600" />
-        <KPI testId="kpi-parts" icon={PackageSearch} label={t("kpi_parts")} value={stats.parts_count} hint={`${stats.low_stock_count} ${t("kpi_low_stock")}`} gradient="from-fuchsia-500 to-pink-600" />
-        <KPI testId="kpi-low-stock" icon={AlertTriangle} label={t("kpi_low_stock")} value={stats.low_stock_count} gradient="from-rose-500 to-red-600" />
-        <KPI testId="kpi-followups" icon={Bell} label={t("kpi_followups")} value={stats.pending_followups} gradient="from-yellow-500 to-amber-600" />
+        <KPI testId="kpi-customers" to="/customers" icon={Users} label={t("kpi_customers")} value={stats.customers_count} gradient="from-teal-500 to-emerald-600" />
+        <KPI testId="kpi-active" to="/maintenance" icon={Wrench} label={t("kpi_active_maint")} value={stats.maint_active} hint={`${stats.maint_total} ${t("total").toLowerCase()}`} gradient="from-sky-500 to-blue-600" />
+        <KPI testId="kpi-debt" to="/debts" icon={Banknote} label={t("kpi_debt_total")} value={fmtMoney(stats.debt_total, cur, lang)} hint={`${stats.open_debts_count} ${t("kpi_open_debts")}`} gradient="from-amber-500 to-orange-600" />
+        <KPI testId="kpi-profit" to="/reports" icon={TrendingUp} label={t("kpi_profit_total")} value={fmtMoney(stats.profit_total, cur, lang)} gradient="from-emerald-500 to-green-600" />
+        <KPI testId="kpi-profit-month" to="/reports" icon={CircleDollarSign} label={t("kpi_profit_month")} value={fmtMoney(stats.profit_month, cur, lang)} hint={fmtMoney(stats.revenue_month, cur, lang) + " " + t("revenue").toLowerCase()} gradient="from-indigo-500 to-purple-600" />
+        <KPI testId="kpi-parts" to="/spare-parts" icon={PackageSearch} label={t("kpi_parts")} value={stats.parts_count} hint={`${stats.low_stock_count} ${t("kpi_low_stock")}`} gradient="from-fuchsia-500 to-pink-600" />
+        <KPI testId="kpi-low-stock" to="/spare-parts" icon={AlertTriangle} label={t("kpi_low_stock")} value={stats.low_stock_count} gradient="from-rose-500 to-red-600" />
+        <KPI testId="kpi-followups" to="/maintenance" icon={Bell} label={t("kpi_followups")} value={stats.pending_followups} gradient="from-yellow-500 to-amber-600" />
       </div>
 
       <div className="grid lg:grid-cols-3 gap-4">

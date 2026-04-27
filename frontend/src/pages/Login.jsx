@@ -5,9 +5,12 @@ import { toast } from "sonner";
 import { useApp } from "@/contexts/AppContext";
 import { formatApiErrorDetail } from "@/lib/api";
 
+const BRAND_AR = "مركز ام الكبر والغزلان";
+const BRAND_EN = "Um Al-Kabar & Al-Ghazlan Center";
+
 export default function Login() {
   const { login, t, lang, theme, toggleLang, toggleTheme } = useApp();
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
@@ -18,7 +21,7 @@ export default function Login() {
     setErr("");
     setLoading(true);
     try {
-      await login(email, password);
+      await login(username.trim().toLowerCase(), password);
       toast.success(t("welcome_back"));
       navigate("/");
     } catch (e2) {
@@ -64,9 +67,11 @@ export default function Login() {
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[hsl(226_64%_33%)] to-[hsl(217_91%_60%)] flex items-center justify-center mb-4 shadow-lg">
               <Sparkles className="w-7 h-7 text-white" strokeWidth={2} />
             </div>
-            <h1 className="text-2xl font-bold tracking-tight">RepairOS</h1>
-            <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground mt-1">
-              {lang === "ar" ? "نظام إدارة الصيانة" : "Repair Management System"}
+            <h1 className="text-xl md:text-2xl font-bold tracking-tight text-center">
+              {lang === "ar" ? BRAND_AR : BRAND_EN}
+            </h1>
+            <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground mt-2">
+              {lang === "ar" ? "نظام إدارة الصيانة" : "Maintenance Management System"}
             </p>
           </div>
 
@@ -82,16 +87,17 @@ export default function Login() {
               <label className="text-xs font-medium mb-1.5 block text-muted-foreground">
                 {lang === "ar" ? "اسم المستخدم" : "Username"}
               </label>
-              <div className="relative">
-                <User className="w-4 h-4 absolute top-3 start-3.5 text-muted-foreground pointer-events-none" />
+              <div className="relative group">
+                <User className="w-4 h-4 absolute top-3.5 start-3.5 text-muted-foreground pointer-events-none transition-colors group-focus-within:text-primary" />
                 <input
-                  data-testid="login-email"
-                  type="email"
+                  data-testid="login-username"
+                  type="text"
                   required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   autoComplete="username"
-                  className="w-full h-11 ps-10 pe-3 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
+                  placeholder={lang === "ar" ? "admin" : "username"}
+                  className="premium-input ps-10"
                 />
               </div>
             </div>
@@ -99,8 +105,8 @@ export default function Login() {
               <label className="text-xs font-medium mb-1.5 block text-muted-foreground">
                 {lang === "ar" ? "كلمة المرور" : "Password"}
               </label>
-              <div className="relative">
-                <Lock className="w-4 h-4 absolute top-3 start-3.5 text-muted-foreground pointer-events-none" />
+              <div className="relative group">
+                <Lock className="w-4 h-4 absolute top-3.5 start-3.5 text-muted-foreground pointer-events-none transition-colors group-focus-within:text-primary" />
                 <input
                   data-testid="login-password"
                   type="password"
@@ -108,13 +114,14 @@ export default function Login() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   autoComplete="current-password"
-                  className="w-full h-11 ps-10 pe-3 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
+                  placeholder="••••••••"
+                  className="premium-input ps-10"
                 />
               </div>
             </div>
 
             {err && (
-              <div data-testid="login-error" className="text-xs text-destructive bg-destructive/10 border border-destructive/20 rounded-lg px-3 py-2">
+              <div data-testid="login-error" className="text-xs text-destructive bg-destructive/10 border border-destructive/20 rounded-xl px-3 py-2.5">
                 {err}
               </div>
             )}
@@ -138,7 +145,7 @@ export default function Login() {
         </div>
 
         <div className="text-center text-xs text-white/50 mt-6">
-          {lang === "ar" ? "© 2026 RepairOS — نظام احترافي لإدارة الصيانة" : "© 2026 RepairOS — Enterprise Repair Management"}
+          {lang === "ar" ? `© 2026 ${BRAND_AR}` : `© 2026 ${BRAND_EN}`}
         </div>
       </div>
     </div>

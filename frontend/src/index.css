@@ -183,6 +183,27 @@ html, body {
 
 .tabular { font-variant-numeric: tabular-nums; }
 
+/* Premium inputs with focus glow */
+.premium-input {
+  @apply w-full h-11 px-3.5 rounded-xl border border-border bg-background text-sm;
+  box-shadow: var(--shadow-sm);
+  outline: none;
+  transition: all 180ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.premium-input.h-9 { height: 2.25rem; }
+.premium-input.h-10 { height: 2.5rem; }
+.premium-input.h-12 { height: 3rem; }
+.premium-input::placeholder { color: hsl(var(--muted-foreground)); opacity: 0.6; }
+.premium-input:hover { border-color: hsl(var(--muted-foreground) / 0.4); }
+.premium-input:focus {
+  border-color: hsl(var(--primary));
+  box-shadow: 0 0 0 4px hsl(var(--primary) / 0.12), var(--shadow-sm);
+}
+.premium-input:disabled { opacity: 0.5; cursor: not-allowed; }
+
+textarea.premium-input { min-height: 72px; padding-top: 10px; padding-bottom: 10px; line-height: 1.5; }
+select.premium-input { cursor: pointer; }
+
 /* Table */
 .data-table { @apply w-full text-sm; }
 .data-table thead th {

@@ -54,14 +54,16 @@ export default function Layout() {
   const SidebarContent = () => (
     <>
       <div className="h-16 flex items-center justify-between px-5 border-b border-border">
-        <div className="flex items-center">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[hsl(226_64%_33%)] to-[hsl(217_91%_60%)] flex items-center justify-center shadow-md">
+        <div className="flex items-center min-w-0">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[hsl(226_64%_33%)] to-[hsl(217_91%_60%)] flex items-center justify-center shadow-md flex-shrink-0">
             <Sparkles className="w-4.5 h-4.5 text-white" strokeWidth={2} />
           </div>
-          <div className="ms-3">
-            <div className="font-bold text-base tracking-tight">RepairOS</div>
-            <div className="text-[10px] text-muted-foreground uppercase tracking-wider truncate max-w-[130px]">
-              {user?.tenant_name || ""}
+          <div className="ms-3 min-w-0">
+            <div className="font-bold text-sm tracking-tight truncate max-w-[160px]" title={user?.tenant_name || ""}>
+              {user?.tenant_name || (lang === "ar" ? "النظام" : "System")}
+            </div>
+            <div className="text-[10px] text-muted-foreground uppercase tracking-wider truncate">
+              {lang === "ar" ? "نظام الصيانة" : "Repair System"}
             </div>
           </div>
         </div>
@@ -133,7 +135,7 @@ export default function Layout() {
 
         <div className="pt-3 px-2 mt-1 border-t border-border">
           <div className="text-xs font-semibold truncate">{user?.name}</div>
-          <div className="text-[10px] text-muted-foreground">{user?.email}</div>
+          <div className="text-[10px] text-muted-foreground truncate">{user?.username}</div>
           <div className="inline-block mt-1 text-[9px] uppercase tracking-wider bg-primary/10 text-primary font-bold px-1.5 py-0.5 rounded">{t(`role_${user?.role}`)}</div>
         </div>
       </div>

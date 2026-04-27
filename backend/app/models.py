@@ -39,7 +39,8 @@ class Tenant(BaseModel):
 class User(BaseModel):
     id: str = Field(default_factory=_uid)
     tenant_id: str
-    email: str
+    username: str
+    email: Optional[str] = None
     name: str
     role: Role = "staff"
     password_hash: str
@@ -135,7 +136,7 @@ class AuditLog(BaseModel):
     id: str = Field(default_factory=_uid)
     tenant_id: str
     user_id: str
-    user_email: str
+    user_email: Optional[str] = None
     action: str  # created/updated/deleted/settled
     entity: str  # maintenance/debt/spare_part/user/settings
     entity_id: Optional[str] = None

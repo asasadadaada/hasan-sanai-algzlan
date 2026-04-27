@@ -26,7 +26,12 @@ limiter = Limiter(key_func=get_remote_address, default_limits=["200/minute"])
 
 async def _ensure_indexes():
     db = get_db()
-    await db.users.create_index("email", unique=True)
+    # Drop the old email-unique index if it exists (migration from email→username)
+    try:
+        await db.users.drop_index("email_1")
+    except Exception:
+        pass
+    await db.users.create_index("username", unique=True, sparse=True)
     await db.users.create_index([("tenant_id", 1)])
     await db.tenants.create_index("id", unique=True)
     await db.customers.create_index([("tenant_id", 1), ("phone", 1)])
@@ -44,27 +49,39 @@ async def _seed_demo():
     from app.models import Tenant, User
     from app.security import hash_password, verify_password
     db = get_db()
-    admin_email = os.environ.get("ADMIN_EMAIL", "admin@repairshop.test")
+    admin_username = os.environ.get("ADMIN_USERNAME", "admin").strip().lower()
     admin_pass = os.environ.get("ADMIN_PASSWORD", "Admin@2026")
+    tenant_name = os.environ.get("DEFAULT_TENANT_NAME", "مركز ام الكبر والغزلان")
 
-    existing = await db.users.find_one({"email": admin_email})
-    if existing:
-        # Ensure password matches .env (idempotent)
-        if not verify_password(admin_pass, existing["password_hash"]):
-            await db.users.update_one({"email": admin_email}, {"$set": {"password_hash": hash_password(admin_pass)}})
+    # Migration: if any existing user has email but no username, give them one
+    await db.users.update_many(
+        {"username": {"$exists": False}, "email": {"$exists": True}},
+        [{"$set": {"username": {"$arrayElemAt": [{"$split": ["$email", "@"]}, 0]}}}],
+    )
+
+    # Ensure there is exactly one default tenant
+    existing_user = await db.users.find_one({"username": admin_username})
+    if existing_user:
+        if not verify_password(admin_pass, existing_user["password_hash"]):
+            await db.users.update_one({"username": admin_username}, {"$set": {"password_hash": hash_password(admin_pass)}})
+        # keep tenant name in sync with env on every boot (user can still edit via settings later)
+        await db.tenants.update_one(
+            {"id": existing_user["tenant_id"], "name": {"$in": ["Demo Repair Shop", "Repair Shop"]}},
+            {"$set": {"name": tenant_name}},
+        )
         return
 
-    tenant = Tenant(name=os.environ.get("DEFAULT_TENANT_NAME", "Demo Repair Shop"))
+    tenant = Tenant(name=tenant_name)
     tdoc = tenant.model_dump(); tdoc["created_at"] = tdoc["created_at"].isoformat()
     await db.tenants.insert_one(tdoc)
 
     user = User(
-        tenant_id=tenant.id, email=admin_email, name="Owner",
+        tenant_id=tenant.id, username=admin_username, name="Owner",
         role="owner", password_hash=hash_password(admin_pass),
     )
     udoc = user.model_dump(); udoc["created_at"] = udoc["created_at"].isoformat()
     await db.users.insert_one(udoc)
-    log.info("Seeded demo owner: %s", admin_email)
+    log.info("Seeded owner username=%s tenant=%s", admin_username, tenant_name)
 
 
 @asynccontextmanager

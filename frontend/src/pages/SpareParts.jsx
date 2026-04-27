@@ -41,7 +41,7 @@ function PartForm({ initial, onClose, onSaved }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
-      <div className="bg-card border border-border rounded-lg w-full max-w-xl max-h-[90vh] overflow-y-auto p-5" onClick={(e) => e.stopPropagation()} data-testid="part-form">
+      <div className="bg-card border border-border rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto p-5" onClick={(e) => e.stopPropagation()} data-testid="part-form">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-semibold">{initial?.id ? t("edit") : t("add_part")}</h3>
           <button onClick={onClose}><X className="w-4 h-4" /></button>
@@ -51,7 +51,7 @@ function PartForm({ initial, onClose, onSaved }) {
             <L label={t("part_name")} testId="p-name" required value={form.name} onChange={(v) => setForm({ ...form, name: v })} />
             <div>
               <label className="text-xs font-medium mb-1.5 block">{t("status")}</label>
-              <select data-testid="p-type" value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} className="w-full h-10 px-3 rounded-xl border border-border bg-transparent text-sm">
+              <select data-testid="p-type" value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} className="premium-input">
                 <option value="original">{t("type_original")}</option>
                 <option value="copy">{t("type_copy")}</option>
               </select>
@@ -80,11 +80,11 @@ function PartForm({ initial, onClose, onSaved }) {
           </div>
           <div>
             <label className="text-xs font-medium mb-1.5 block">{t("notes")}</label>
-            <textarea data-testid="p-notes" value={form.notes || ""} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="w-full min-h-[60px] px-3 py-2 rounded-xl border border-border bg-transparent text-sm" />
+            <textarea data-testid="p-notes" value={form.notes || ""} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="premium-input" />
           </div>
           <div className="flex justify-end gap-2 pt-2">
-            <button type="button" onClick={onClose} className="h-9 px-4 rounded-xl border border-border text-sm">{t("cancel")}</button>
-            <button type="submit" data-testid="p-submit" disabled={saving} className="h-9 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-medium">{t("save")}</button>
+            <button type="button" onClick={onClose} className="btn-outline h-9">{t("cancel")}</button>
+            <button type="submit" data-testid="p-submit" disabled={saving} className="btn-primary h-9">{t("save")}</button>
           </div>
         </form>
       </div>
@@ -96,7 +96,7 @@ function L({ label, testId, type = "text", value, onChange, required }) {
   return (
     <div>
       <label className="text-xs font-medium mb-1.5 block">{label}</label>
-      <input data-testid={testId} type={type} required={required} value={value ?? ""} onChange={(e) => onChange(e.target.value)} className="w-full h-10 px-3 rounded-xl border border-border bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20" />
+      <input data-testid={testId} type={type} required={required} value={value ?? ""} onChange={(e) => onChange(e.target.value)} className="premium-input" />
     </div>
   );
 }
@@ -139,7 +139,7 @@ export default function SpareParts() {
       </div>
       <div className="relative max-w-md">
         <Search className="w-4 h-4 absolute top-2.5 start-3 text-muted-foreground" />
-        <input data-testid="parts-search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("search")} className="w-full h-9 ps-9 pe-3 rounded-xl border border-border bg-transparent text-sm" />
+        <input data-testid="parts-search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("search")} className="premium-input h-9 ps-9" />
       </div>
       <div className="swiss-card overflow-x-auto">
         <table className="data-table">
@@ -169,10 +169,10 @@ export default function SpareParts() {
                 <td>
                   <div className="flex justify-end gap-1">
                     {p.quantity > 0 && (
-                      <button onClick={() => use(p)} data-testid={`use-part-${p.id}`} title={t("use_part")} className="p-1.5 rounded hover:bg-muted"><Minus className="w-4 h-4" /></button>
+                      <button onClick={() => use(p)} data-testid={`use-part-${p.id}`} title={t("use_part")} className="p-1.5 rounded-lg hover:bg-muted press transition-colors"><Minus className="w-4 h-4" /></button>
                     )}
-                    <button onClick={() => setEditing(p)} data-testid={`edit-part-${p.id}`} className="p-1.5 rounded hover:bg-muted"><Edit className="w-4 h-4" /></button>
-                    <button onClick={() => del(p)} data-testid={`delete-part-${p.id}`} className="p-1.5 rounded hover:bg-destructive/10 text-destructive"><Trash2 className="w-4 h-4" /></button>
+                    <button onClick={() => setEditing(p)} data-testid={`edit-part-${p.id}`} className="p-1.5 rounded-lg hover:bg-muted press transition-colors"><Edit className="w-4 h-4" /></button>
+                    <button onClick={() => del(p)} data-testid={`delete-part-${p.id}`} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive press transition-colors"><Trash2 className="w-4 h-4" /></button>
                   </div>
                 </td>
               </tr>

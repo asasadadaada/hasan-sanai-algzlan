@@ -35,16 +35,14 @@ export function AppProvider({ children }) {
 
   useEffect(() => { checkAuth(); }, [checkAuth]);
 
-  const login = useCallback(async (email, password) => {
-    const { data } = await api.post("/auth/login", { email, password });
+  const login = useCallback(async (username, password) => {
+    const { data } = await api.post("/auth/login", { username, password });
     setUser(data);
     return data;
   }, []);
 
-  const register = useCallback(async (payload) => {
-    const { data } = await api.post("/auth/register", payload);
-    setUser(data);
-    return data;
+  const register = useCallback(async () => {
+    throw new Error("Registration is disabled");
   }, []);
 
   const logout = useCallback(async () => {

@@ -1,7 +1,7 @@
 export const translations = {
   ar: {
     // Common
-    app_name: "RepairOS",
+    app_name: "مركز ام الكبر والغزلان",
     loading: "جارٍ التحميل...",
     save: "حفظ",
     cancel: "إلغاء",
@@ -143,9 +143,17 @@ export const translations = {
     payment: "دفعة",
     amount: "المبلغ",
     enter_amount: "أدخل المبلغ",
+    username: "اسم المستخدم",
+    current_password: "كلمة المرور الحالية",
+    new_password: "كلمة المرور الجديدة",
+    account: "الحساب",
+    profile: "الملف الشخصي",
+    update_username: "تحديث اسم المستخدم",
+    update_password: "تحديث كلمة المرور",
+    system_name: "اسم النظام",
   },
   en: {
-    app_name: "RepairOS",
+    app_name: "Um Al-Kabar Center",
     loading: "Loading...",
     save: "Save", cancel: "Cancel", delete: "Delete", edit: "Edit", add: "Add",
     search: "Search", actions: "Actions", confirm: "Confirm", yes: "Yes", no: "No",
@@ -201,6 +209,10 @@ export const translations = {
     signed_in_as: "Signed in as", role: "Role",
     saved: "Saved", error: "Error", already_used: "already used",
     payment: "Payment", amount: "Amount", enter_amount: "Enter amount",
+    username: "Username", current_password: "Current password",
+    new_password: "New password", account: "Account", profile: "Profile",
+    update_username: "Update username", update_password: "Update password",
+    system_name: "System name",
   },
 };
 

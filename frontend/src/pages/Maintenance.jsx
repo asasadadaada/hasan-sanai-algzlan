@@ -51,7 +51,7 @@ function MaintenanceForm({ initial, onClose, onSaved }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={onClose}>
-      <div className="bg-card border border-border rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()} data-testid="maintenance-form-modal">
+      <div className="bg-card border border-border rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()} data-testid="maintenance-form-modal">
         <div className="p-5 border-b border-border flex items-center justify-between sticky top-0 bg-card">
           <h3 className="font-semibold">{initial?.id ? t("edit") : t("add_maintenance")}</h3>
           <button onClick={onClose} data-testid="close-maintenance-form"><X className="w-4 h-4" /></button>
@@ -65,7 +65,7 @@ function MaintenanceForm({ initial, onClose, onSaved }) {
           </div>
           <div>
             <label className="text-xs font-medium mb-1.5 block">{t("issue")}</label>
-            <textarea data-testid="m-issue" required value={form.issue} onChange={(e) => setForm({ ...form, issue: e.target.value })} className="w-full min-h-[72px] px-3 py-2 rounded-xl border border-border bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20" />
+            <textarea data-testid="m-issue" required value={form.issue} onChange={(e) => setForm({ ...form, issue: e.target.value })} className="premium-input" />
           </div>
 
           <div>
@@ -98,7 +98,7 @@ function MaintenanceForm({ initial, onClose, onSaved }) {
             <Field label={t("paid_amount")} type="number" testId="m-paid" value={form.paid_amount} onChange={(v) => setForm({ ...form, paid_amount: v })} />
             <div>
               <label className="text-xs font-medium mb-1.5 block">{t("status")}</label>
-              <select data-testid="m-status" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} className="w-full h-10 px-3 rounded-xl border border-border bg-transparent text-sm">
+              <select data-testid="m-status" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} className="premium-input">
                 <option value="in_progress">{t("in_progress")}</option>
                 <option value="completed">{t("completed")}</option>
                 <option value="delivered">{t("delivered")}</option>
@@ -108,7 +108,7 @@ function MaintenanceForm({ initial, onClose, onSaved }) {
           </div>
 
           <div className="flex items-center justify-end gap-2 pt-4 border-t border-border">
-            <button type="button" onClick={onClose} className="px-4 h-9 rounded-xl border border-border text-sm">{t("cancel")}</button>
+            <button type="button" onClick={onClose} className="btn-outline h-9">{t("cancel")}</button>
             <button type="submit" disabled={saving} data-testid="m-submit" className="px-4 h-9 rounded-xl bg-primary text-primary-foreground text-sm font-medium">{saving ? t("loading") : t("save")}</button>
           </div>
         </form>
@@ -121,7 +121,7 @@ function Field({ label, testId, type = "text", value, onChange, required }) {
   return (
     <div>
       <label className="text-xs font-medium mb-1.5 block">{label}</label>
-      <input data-testid={testId} type={type} required={required} value={value ?? ""} onChange={(e) => onChange(e.target.value)} className="w-full h-10 px-3 rounded-xl border border-border bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20" />
+      <input data-testid={testId} type={type} required={required} value={value ?? ""} onChange={(e) => onChange(e.target.value)} className="premium-input" />
     </div>
   );
 }
@@ -138,13 +138,13 @@ function PayModal({ mid, onClose, onSaved }) {
   };
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
-      <div className="bg-card border border-border rounded-lg w-full max-w-sm p-5" onClick={(e) => e.stopPropagation()} data-testid="pay-modal">
+      <div className="bg-card border border-border rounded-2xl w-full max-w-sm p-5" onClick={(e) => e.stopPropagation()} data-testid="pay-modal">
         <h3 className="font-semibold mb-4">{t("payment")}</h3>
         <form onSubmit={submit}>
           <input data-testid="pay-amount" autoFocus required type="number" min="0" step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder={t("enter_amount")} className="w-full h-10 px-3 rounded-xl border border-border bg-transparent text-sm mb-3" />
           <div className="flex gap-2">
-            <button type="button" onClick={onClose} className="flex-1 h-9 rounded-xl border border-border text-sm">{t("cancel")}</button>
-            <button type="submit" data-testid="pay-submit" className="flex-1 h-9 rounded-xl bg-primary text-primary-foreground text-sm font-medium">{t("pay")}</button>
+            <button type="button" onClick={onClose} className="btn-outline h-9 flex-1">{t("cancel")}</button>
+            <button type="submit" data-testid="pay-submit" className="btn-primary h-9 flex-1">{t("pay")}</button>
           </div>
         </form>
       </div>
@@ -219,9 +219,9 @@ export default function Maintenance() {
       <div className="flex items-center gap-3 flex-wrap">
         <div className="relative flex-1 min-w-[240px]">
           <Search className="w-4 h-4 absolute top-2.5 start-3 text-muted-foreground" />
-          <input data-testid="maint-search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("search")} className="w-full h-9 ps-9 pe-3 rounded-xl border border-border bg-transparent text-sm" />
+          <input data-testid="maint-search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("search")} className="premium-input h-9 ps-9" />
         </div>
-        <select data-testid="maint-status-filter" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="h-9 px-3 rounded-xl border border-border bg-transparent text-sm">
+        <select data-testid="maint-status-filter" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="premium-input h-9 w-auto px-3">
           <option value="">{t("all")}</option>
           <option value="in_progress">{t("in_progress")}</option>
           <option value="completed">{t("completed")}</option>
@@ -262,7 +262,7 @@ export default function Maintenance() {
                 <td>
                   <div className="flex items-center justify-end gap-1">
                     {m.debt_amount > 0 && (
-                      <button title={t("pay")} onClick={() => setPaying(m.id)} data-testid={`pay-${m.id}`} className="p-1.5 rounded hover:bg-muted"><DollarSign className="w-4 h-4" /></button>
+                      <button title={t("pay")} onClick={() => setPaying(m.id)} data-testid={`pay-${m.id}`} className="p-1.5 rounded-lg hover:bg-muted press transition-colors"><DollarSign className="w-4 h-4" /></button>
                     )}
                     {(m.status === "in_progress" || m.status === "completed") && (
                       <button title={t("mark_complete")} onClick={() => complete(m)} data-testid={`complete-${m.id}`} className="p-1.5 rounded hover:bg-muted text-[hsl(var(--whatsapp))]"><CheckCircle2 className="w-4 h-4" /></button>
@@ -270,9 +270,9 @@ export default function Maintenance() {
                     {m.status === "delivered" && !m.follow_up_sent && (
                       <button title={t("send_followup")} onClick={() => sendFollowup(m)} data-testid={`followup-${m.id}`} className="p-1.5 rounded hover:bg-muted text-[hsl(var(--whatsapp))]"><MessageCircle className="w-4 h-4" /></button>
                     )}
-                    <button title={t("print")} onClick={() => printInvoice(m)} data-testid={`print-${m.id}`} className="p-1.5 rounded hover:bg-muted"><Printer className="w-4 h-4" /></button>
-                    <button title={t("edit")} onClick={() => setEditing(m)} data-testid={`edit-${m.id}`} className="p-1.5 rounded hover:bg-muted"><Edit className="w-4 h-4" /></button>
-                    <button title={t("delete")} onClick={() => del(m)} data-testid={`delete-${m.id}`} className="p-1.5 rounded hover:bg-destructive/10 text-destructive"><Trash2 className="w-4 h-4" /></button>
+                    <button title={t("print")} onClick={() => printInvoice(m)} data-testid={`print-${m.id}`} className="p-1.5 rounded-lg hover:bg-muted press transition-colors"><Printer className="w-4 h-4" /></button>
+                    <button title={t("edit")} onClick={() => setEditing(m)} data-testid={`edit-${m.id}`} className="p-1.5 rounded-lg hover:bg-muted press transition-colors"><Edit className="w-4 h-4" /></button>
+                    <button title={t("delete")} onClick={() => del(m)} data-testid={`delete-${m.id}`} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive press transition-colors"><Trash2 className="w-4 h-4" /></button>
                   </div>
                 </td>
               </tr>

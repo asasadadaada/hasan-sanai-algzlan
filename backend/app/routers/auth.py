@@ -84,8 +84,11 @@ async def register(req: RegisterReq, response: Response):
 async def login(req: LoginReq, request: Request, response: Response):
     db = get_db()
     email = req.email.lower().strip()
-    ip = request.client.host if request.client else "unknown"
-    key = f"{ip}:{email}"
+    xff = request.headers.get("x-forwarded-for", "")
+    ip = xff.split(",")[0].strip() if xff else (request.client.host if request.client else "unknown")
+    # Key by email only so a distributed ingress cannot bypass lockout by splitting across pods.
+    # IP is still recorded for audit/RCA via last_attempt_ip.
+    key = f"email:{email}"
 
     # brute force check
     now = datetime.now(timezone.utc)
@@ -102,7 +105,7 @@ async def login(req: LoginReq, request: Request, response: Response):
     user = await db.users.find_one({"email": email})
     if not user or not verify_password(req.password, user["password_hash"]):
         count = (attempts.get("count", 0) if attempts else 0) + 1
-        update = {"identifier": key, "count": count, "last_attempt": now.isoformat()}
+        update = {"identifier": key, "count": count, "last_attempt": now.isoformat(), "last_attempt_ip": ip}
         if count >= MAX_ATTEMPTS:
             update["locked_until"] = (now + timedelta(minutes=LOCKOUT_MINUTES)).isoformat()
             update["count"] = 0

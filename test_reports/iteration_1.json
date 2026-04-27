@@ -1,0 +1,62 @@
+{
+  "summary": "Comprehensive backend regression of RepairShop SaaS (28 pytest tests) — auth, RBAC, customers, spare-parts, maintenance (auto-debt + parts deduction + complete + followups), debts (partial/full pay), dashboard stats/search/audit, settings + telegram/test, invoice PDF, and multi-tenant isolation. All 28 pass against the public REACT_APP_BACKEND_URL. One real backend bug uncovered: brute-force lockout is unreliable (see backend_issues.critical).",
+  "backend_issues": {
+    "critical": [
+      {
+        "endpoint": "POST /api/auth/login (brute-force protection)",
+        "issue": "Lockout key uses `request.client.host` which behind a load-balanced K8s ingress resolves to the immediate ingress-pod IP (e.g. 10.64.135.205, 10.64.129.146 alternating). With multiple ingress pods, no single pod's `(ip:email)` counter ever reaches the 5-attempt threshold within a normal attack burst. Verified in the live `login_attempts` collection: count stays at 2-3 per pod. With 6 fast bad-password attempts the response stays 401 and never returns 429. Lockout only triggers after ~10-12 attempts when one pod happens to accumulate 5. This effectively weakens MAX_ATTEMPTS=5 by a factor of (number of ingress pods).",
+        "priority": "HIGH",
+        "fix_suggestion": "Key brute-force counter on the real client IP from `X-Forwarded-For` header (first hop) or, simpler, by `email` only (drop the IP segment). Reuse the existing slowapi `get_remote_address` which already supports XFF. Example: `ip = request.headers.get('x-forwarded-for','').split(',')[0].strip() or request.client.host`."
+      }
+    ],
+    "minor": [
+      {
+        "endpoint": "POST /api/auth/refresh",
+        "issue": "Returned access JWT is byte-identical to the previous one when refresh happens within the same UTC second (sub/tid/role/exp all equal → deterministic HS256). Functionally fine (still authenticates), but a sub-second double-refresh produces 'no rotation'. If true rotation is required for security, include a `jti`/`iat` claim."
+      },
+      {
+        "endpoint": "GET /api/maintenance",
+        "issue": "Date filtering on `created_at` is performed via ISO-string range comparison (e.g. dashboard `chart_30d`, `profit_month`). Works because UTC ISO-8601 sorts lexicographically, but is fragile if a future commit ever stores a naïve/local string. Consider native datetime persistence."
+      },
+      {
+        "endpoint": "POST /api/customers",
+        "issue": "On duplicate phone the endpoint returns the existing customer with HTTP 200 silently — the client cannot distinguish 'created' vs 'already-exists'. A 200 with a flag (`existed: true`) or a 409 would be cleaner."
+      }
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_repairshop_backend.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "FIX brute-force lockout: switch identifier from request.client.host to X-Forwarded-For (or email-only). Currently a single attacker can issue ~2x MAX_ATTEMPTS bad passwords before any lock — confirmed via live login_attempts collection inspection.",
+    "(Optional) Add jti/iat to JWT claims so /auth/refresh always rotates the token even within the same second.",
+    "(Optional) Return 409 (or `{existed:true}`) from POST /api/customers when the phone already exists — silent 200 hides creation status."
+  ],
+  "critical_code_review_comments": [
+    "Brute-force IP key is not proxy-aware → easily defeated behind a load-balanced ingress (HIGH).",
+    "auth.py logout() depends on get_current_user — if token is already missing the user gets 401 instead of an idempotent 200. Consider making logout best-effort.",
+    "maintenance.py _deduct_parts uses `quantity: {$gte: qty}` filter but does NOT raise/rollback if the update matched 0 (e.g. insufficient stock). Maintenance is created and parts_used recorded even if stock was insufficient. Recommend checking matched_count and either rolling back the maintenance creation or returning a 400.",
+    "dashboard.py performs N separate aggregations + a 30-day cursor scan per request. For tenants with high volume, cache the dashboard payload (~30s TTL) or reuse a single aggregate pipeline.",
+    "auth.register lacks rate limiting — should be 5/minute via slowapi to prevent tenant-spam.",
+    "settings PATCH allows clearing telegram_bot_token by sending empty string but stores '' (falsy). Currently the test exploits this to disable telegram — fine for testing, but UI should guard against it.",
+    "models.py: parts_used stores price client-supplied; nothing prevents a staff user from sending price=0 to inflate profit. Optionally lock to the spare_parts.sell_price when part_id is provided."
+  ],
+  "updated_files": [
+    "/app/backend/tests/__init__.py (new)",
+    "/app/backend/tests/test_repairshop_backend.py (new)"
+  ],
+  "success_rate": {"backend": "100% (28/28)", "frontend": "not tested (backend-only request)"},
+  "test_credentials": "admin@repairshop.com / Admin@2026 (seeded owner). Tests also create+register temporary tenants (TEST_A_Shop / TEST_B_Shop) and a staff user; staff is deleted at end of TestRBAC.",
+  "seed_data_creation": "Tests create TEST_-prefixed customers/parts/maintenance/debts. Most are cleaned up inline (delete after assert) but a few TEST_ customers/parts created during multi-tenant isolation register flow remain in their respective auto-created tenants (orphan tenants are harmless, isolated by tenant_id).",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "main_agent_can_self_test": false,
+  "context_for_next_testing_agent": "Re-run `pytest /app/backend/tests/test_repairshop_backend.py -v` after main agent fixes brute-force IP detection. Expect 28/28 to still pass and the brute-force test should now fire 429 within 6 attempts (not 12). If main agent rate-limits /auth/register, adjust TestTenantIsolation accordingly. login_attempts collection may need to be cleared between runs if running >once/minute on the same admin email — tests use unique uuid emails so admin should be safe.",
+  "rca of the issue": "Brute-force counter: the auth router builds the lockout key as `f\"{ip}:{email}\"` using `request.client.host`. In Kubernetes the FastAPI app sits behind nginx-ingress fronted by Cloudflare. `request.client.host` is therefore the IP of whichever ingress pod terminates the TCP connection, NOT the originating attacker IP. Live MongoDB inspection of `login_attempts` shows two distinct rows per email — `10.64.135.205:<email>` and `10.64.129.146:<email>` — each with count<=3, because requests round-robin across two ingress pods. Reproduction: `for i in {1..7}; do curl -X POST $URL/api/auth/login -d '{\"email\":\"x@x.com\",\"password\":\"x\"}' -H 'Content-Type: application/json'; done` → all 7 return 401, never 429. Mitigation: read `X-Forwarded-For` header (already added by ingress) and use the first IP, OR drop the IP component entirely and key by email (simpler, more secure for credential stuffing)."
+}

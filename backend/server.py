@@ -1,89 +1,119 @@
-from fastapi import FastAPI, APIRouter
+"""Main FastAPI application - Repair Shop Enterprise SaaS."""
 from dotenv import load_dotenv
-from starlette.middleware.cors import CORSMiddleware
-from motor.motor_asyncio import AsyncIOMotorClient
+from pathlib import Path
+load_dotenv(Path(__file__).parent / ".env")
+
 import os
 import logging
-from pathlib import Path
-from pydantic import BaseModel, Field, ConfigDict
-from typing import List
-import uuid
-from datetime import datetime, timezone
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+from starlette.middleware.cors import CORSMiddleware
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+
+from app.deps import get_db
+from app.scheduler_service import start_scheduler, stop_scheduler
+from app.routers import auth, customers, maintenance, debts, spare_parts, dashboard, settings as settings_router, invoices
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+log = logging.getLogger("repairshop")
+
+limiter = Limiter(key_func=get_remote_address, default_limits=["200/minute"])
 
 
-ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env')
+async def _ensure_indexes():
+    db = get_db()
+    await db.users.create_index("email", unique=True)
+    await db.users.create_index([("tenant_id", 1)])
+    await db.tenants.create_index("id", unique=True)
+    await db.customers.create_index([("tenant_id", 1), ("phone", 1)])
+    await db.customers.create_index([("tenant_id", 1), ("id", 1)])
+    await db.maintenance.create_index([("tenant_id", 1), ("status", 1)])
+    await db.maintenance.create_index([("tenant_id", 1), ("customer_id", 1)])
+    await db.debts.create_index([("tenant_id", 1), ("status", 1)])
+    await db.spare_parts.create_index([("tenant_id", 1), ("name", 1)])
+    await db.audit_logs.create_index([("tenant_id", 1), ("created_at", -1)])
+    await db.login_attempts.create_index("identifier")
 
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
 
-# Create the main app without a prefix
-app = FastAPI()
+async def _seed_demo():
+    """Seed a demo tenant + owner if DB empty, for testing."""
+    from app.models import Tenant, User
+    from app.security import hash_password, verify_password
+    db = get_db()
+    admin_email = os.environ.get("ADMIN_EMAIL", "admin@repairshop.test")
+    admin_pass = os.environ.get("ADMIN_PASSWORD", "Admin@2026")
 
-# Create a router with the /api prefix
-api_router = APIRouter(prefix="/api")
+    existing = await db.users.find_one({"email": admin_email})
+    if existing:
+        # Ensure password matches .env (idempotent)
+        if not verify_password(admin_pass, existing["password_hash"]):
+            await db.users.update_one({"email": admin_email}, {"$set": {"password_hash": hash_password(admin_pass)}})
+        return
+
+    tenant = Tenant(name=os.environ.get("DEFAULT_TENANT_NAME", "Demo Repair Shop"))
+    tdoc = tenant.model_dump(); tdoc["created_at"] = tdoc["created_at"].isoformat()
+    await db.tenants.insert_one(tdoc)
+
+    user = User(
+        tenant_id=tenant.id, email=admin_email, name="Owner",
+        role="owner", password_hash=hash_password(admin_pass),
+    )
+    udoc = user.model_dump(); udoc["created_at"] = udoc["created_at"].isoformat()
+    await db.users.insert_one(udoc)
+    log.info("Seeded demo owner: %s", admin_email)
 
 
-# Define Models
-class StatusCheck(BaseModel):
-    model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
-    
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await _ensure_indexes()
+    await _seed_demo()
+    start_scheduler()
+    yield
+    stop_scheduler()
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
 
-# Add your routes to the router instead of directly to app
-@api_router.get("/")
-async def root():
-    return {"message": "Hello World"}
+app = FastAPI(title="Repair Shop SaaS", lifespan=lifespan)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.model_dump()
-    status_obj = StatusCheck(**status_dict)
-    
-    # Convert to dict and serialize datetime to ISO string for MongoDB
-    doc = status_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
-    
-    _ = await db.status_checks.insert_one(doc)
-    return status_obj
-
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    # Exclude MongoDB's _id field from the query results
-    status_checks = await db.status_checks.find({}, {"_id": 0}).to_list(1000)
-    
-    # Convert ISO string timestamps back to datetime objects
-    for check in status_checks:
-        if isinstance(check['timestamp'], str):
-            check['timestamp'] = datetime.fromisoformat(check['timestamp'])
-    
-    return status_checks
-
-# Include the router in the main app
-app.include_router(api_router)
+origins = [o.strip() for o in os.environ.get("CORS_ORIGINS", "").split(",") if o.strip()]
+if not origins:
+    origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
+    allow_origins=origins,
     allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
 
-@app.on_event("shutdown")
-async def shutdown_db_client():
-    client.close()
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    log.exception("Unhandled: %s", exc)
+    return JSONResponse(status_code=500, content={"detail": "Internal server error"})
+
+
+@app.get("/api/")
+async def root():
+    return {"name": "Repair Shop Enterprise SaaS", "status": "ok"}
+
+
+@app.get("/api/health")
+async def health():
+    return {"status": "healthy"}
+
+
+app.include_router(auth.router)
+app.include_router(customers.router)
+app.include_router(maintenance.router)
+app.include_router(debts.router)
+app.include_router(spare_parts.router)
+app.include_router(dashboard.router)
+app.include_router(settings_router.router)
+app.include_router(invoices.router)

@@ -17,7 +17,7 @@ function Field({ label, testId, type = "text", value, onChange, placeholder }) {
   return (
     <div>
       <label className="text-xs font-medium mb-1.5 block">{label}</label>
-      <input data-testid={testId} type={type} value={value ?? ""} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className="w-full h-10 px-3 rounded-md border border-border bg-transparent text-sm" />
+      <input data-testid={testId} type={type} value={value ?? ""} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className="w-full h-10 px-3 rounded-xl border border-border bg-transparent text-sm" />
     </div>
   );
 }
@@ -26,7 +26,7 @@ function TextField({ label, testId, value, onChange, rows = 3 }) {
   return (
     <div>
       <label className="text-xs font-medium mb-1.5 block">{label}</label>
-      <textarea data-testid={testId} rows={rows} value={value ?? ""} onChange={(e) => onChange(e.target.value)} className="w-full px-3 py-2 rounded-md border border-border bg-transparent text-sm font-mono" />
+      <textarea data-testid={testId} rows={rows} value={value ?? ""} onChange={(e) => onChange(e.target.value)} className="w-full px-3 py-2 rounded-xl border border-border bg-transparent text-sm font-mono" />
     </div>
   );
 }
@@ -71,7 +71,7 @@ function UsersTab() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="text-sm text-muted-foreground">{users.length} {t("users_management").toLowerCase()}</div>
-        <button onClick={() => setAdding(true)} data-testid="add-user-btn" className="inline-flex items-center gap-2 h-9 px-3 rounded-md bg-foreground text-background text-xs font-medium"><UserPlus className="w-3.5 h-3.5" />{t("add")}</button>
+        <button onClick={() => setAdding(true)} data-testid="add-user-btn" className="inline-flex items-center gap-2 h-9 px-3 rounded-md bg-primary text-primary-foreground text-xs font-medium"><UserPlus className="w-3.5 h-3.5" />{t("add")}</button>
       </div>
 
       <div className="overflow-x-auto">
@@ -109,14 +109,14 @@ function UsersTab() {
               <Field label={t("password")} type="password" testId="u-password" value={form.password} onChange={(v) => setForm({ ...form, password: v })} />
               <div>
                 <label className="text-xs font-medium mb-1.5 block">{t("role")}</label>
-                <select data-testid="u-role" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className="w-full h-10 px-3 rounded-md border border-border bg-transparent text-sm">
+                <select data-testid="u-role" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className="w-full h-10 px-3 rounded-xl border border-border bg-transparent text-sm">
                   {user?.role === "owner" && <option value="manager">{t("role_manager")}</option>}
                   <option value="staff">{t("role_staff")}</option>
                 </select>
               </div>
               <div className="flex justify-end gap-2">
-                <button type="button" onClick={() => setAdding(false)} className="h-9 px-4 rounded-md border border-border text-sm">{t("cancel")}</button>
-                <button type="submit" data-testid="u-submit" className="h-9 px-4 rounded-md bg-foreground text-background text-sm font-medium">{t("save")}</button>
+                <button type="button" onClick={() => setAdding(false)} className="h-9 px-4 rounded-xl border border-border text-sm">{t("cancel")}</button>
+                <button type="submit" data-testid="u-submit" className="h-9 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-medium">{t("save")}</button>
               </div>
             </form>
           </div>
@@ -167,7 +167,7 @@ export default function Settings() {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-semibold tracking-tight">{t("settings")}</h1>
         {tab !== "users" && (
-          <button onClick={save} disabled={saving} data-testid="save-settings" className="inline-flex items-center gap-2 h-9 px-4 rounded-md bg-foreground text-background text-sm font-medium"><Save className="w-4 h-4" />{t("save")}</button>
+          <button onClick={save} disabled={saving} data-testid="save-settings" className="inline-flex items-center gap-2 h-9 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-medium"><Save className="w-4 h-4" />{t("save")}</button>
         )}
       </div>
 
@@ -204,7 +204,7 @@ export default function Settings() {
           <Toggle label={t("notify_maintenance")} checked={!!settings.telegram_notify_maintenance} onChange={(v) => upd({ telegram_notify_maintenance: v })} testId="tg-notify-m" />
           <Toggle label={t("notify_debts")} checked={!!settings.telegram_notify_debts} onChange={(v) => upd({ telegram_notify_debts: v })} testId="tg-notify-d" />
           <Toggle label={t("notify_daily")} checked={!!settings.telegram_notify_daily} onChange={(v) => upd({ telegram_notify_daily: v })} testId="tg-notify-day" />
-          <button onClick={testTelegram} disabled={testing} data-testid="tg-test" className="inline-flex items-center gap-2 h-9 px-4 rounded-md border border-border text-sm hover:bg-muted"><Send className="w-4 h-4" />{t("test_connection")}</button>
+          <button onClick={testTelegram} disabled={testing} data-testid="tg-test" className="inline-flex items-center gap-2 h-9 px-4 rounded-xl border border-border text-sm hover:bg-muted"><Send className="w-4 h-4" />{t("test_connection")}</button>
         </Section>
       )}
 

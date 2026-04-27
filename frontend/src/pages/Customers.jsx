@@ -27,19 +27,19 @@ function CustomerForm({ initial, onClose, onSaved }) {
         <form onSubmit={submit} className="space-y-3">
           <div>
             <label className="text-xs font-medium mb-1.5 block">{t("name")}</label>
-            <input data-testid="c-name" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full h-10 px-3 rounded-md border border-border bg-transparent text-sm" />
+            <input data-testid="c-name" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full h-10 px-3 rounded-xl border border-border bg-transparent text-sm" />
           </div>
           <div>
             <label className="text-xs font-medium mb-1.5 block">{t("phone")}</label>
-            <input data-testid="c-phone" required value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="w-full h-10 px-3 rounded-md border border-border bg-transparent text-sm" />
+            <input data-testid="c-phone" required value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="w-full h-10 px-3 rounded-xl border border-border bg-transparent text-sm" />
           </div>
           <div>
             <label className="text-xs font-medium mb-1.5 block">{t("notes")}</label>
-            <textarea data-testid="c-notes" value={form.notes || ""} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="w-full min-h-[60px] px-3 py-2 rounded-md border border-border bg-transparent text-sm" />
+            <textarea data-testid="c-notes" value={form.notes || ""} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="w-full min-h-[60px] px-3 py-2 rounded-xl border border-border bg-transparent text-sm" />
           </div>
           <div className="flex justify-end gap-2">
-            <button type="button" onClick={onClose} className="h-9 px-4 rounded-md border border-border text-sm">{t("cancel")}</button>
-            <button type="submit" data-testid="c-submit" disabled={saving} className="h-9 px-4 rounded-md bg-foreground text-background text-sm font-medium">{t("save")}</button>
+            <button type="button" onClick={onClose} className="h-9 px-4 rounded-xl border border-border text-sm">{t("cancel")}</button>
+            <button type="submit" data-testid="c-submit" disabled={saving} className="h-9 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-medium">{t("save")}</button>
           </div>
         </form>
       </div>
@@ -75,13 +75,13 @@ export default function Customers() {
     <div className="space-y-5">
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <h1 className="text-3xl font-semibold tracking-tight">{t("customers")}</h1>
-        <button onClick={() => setEditing({})} data-testid="add-customer-btn" className="inline-flex items-center gap-2 h-9 px-4 rounded-md bg-foreground text-background text-sm font-medium">
+        <button onClick={() => setEditing({})} data-testid="add-customer-btn" className="inline-flex items-center gap-2 h-9 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-medium">
           <Plus className="w-4 h-4" /> {t("add")}
         </button>
       </div>
       <div className="relative max-w-md">
         <Search className="w-4 h-4 absolute top-2.5 start-3 text-muted-foreground" />
-        <input data-testid="customer-search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("search")} className="w-full h-9 ps-9 pe-3 rounded-md border border-border bg-transparent text-sm" />
+        <input data-testid="customer-search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("search")} className="w-full h-9 ps-9 pe-3 rounded-xl border border-border bg-transparent text-sm" />
       </div>
       <div className="swiss-card overflow-x-auto">
         <table className="data-table">

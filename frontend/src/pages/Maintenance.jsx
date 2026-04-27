@@ -65,7 +65,7 @@ function MaintenanceForm({ initial, onClose, onSaved }) {
           </div>
           <div>
             <label className="text-xs font-medium mb-1.5 block">{t("issue")}</label>
-            <textarea data-testid="m-issue" required value={form.issue} onChange={(e) => setForm({ ...form, issue: e.target.value })} className="w-full min-h-[72px] px-3 py-2 rounded-md border border-border bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20" />
+            <textarea data-testid="m-issue" required value={form.issue} onChange={(e) => setForm({ ...form, issue: e.target.value })} className="w-full min-h-[72px] px-3 py-2 rounded-xl border border-border bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20" />
           </div>
 
           <div>
@@ -77,16 +77,16 @@ function MaintenanceForm({ initial, onClose, onSaved }) {
               {form.parts_used.map((p, i) => (
                 <div key={i} className="grid grid-cols-[2fr_1fr_1fr_auto] gap-2 items-end" data-testid={`m-part-${i}`}>
                   <div>
-                    <select value={p.part_id || ""} onChange={(e) => updPart(i, "part_id", e.target.value)} data-testid={`m-part-select-${i}`} className="w-full h-9 rounded-md border border-border bg-transparent px-2 text-xs">
+                    <select value={p.part_id || ""} onChange={(e) => updPart(i, "part_id", e.target.value)} data-testid={`m-part-select-${i}`} className="w-full h-9 rounded-xl border border-border bg-transparent px-2 text-xs">
                       <option value="">— {t("part_name")} —</option>
                       {parts.map((x) => (<option key={x.id} value={x.id}>{x.name} ({x.quantity})</option>))}
                     </select>
                     {!p.part_id && (
-                      <input placeholder={t("part_name")} value={p.name} onChange={(e) => updPart(i, "name", e.target.value)} className="mt-1 w-full h-9 rounded-md border border-border bg-transparent px-2 text-xs" />
+                      <input placeholder={t("part_name")} value={p.name} onChange={(e) => updPart(i, "name", e.target.value)} className="mt-1 w-full h-9 rounded-xl border border-border bg-transparent px-2 text-xs" />
                     )}
                   </div>
-                  <input type="number" min="1" value={p.qty} onChange={(e) => updPart(i, "qty", e.target.value)} className="h-9 rounded-md border border-border bg-transparent px-2 text-xs tabular" placeholder={t("quantity")} />
-                  <input type="number" min="0" step="0.01" value={p.price} onChange={(e) => updPart(i, "price", e.target.value)} className="h-9 rounded-md border border-border bg-transparent px-2 text-xs tabular" placeholder={t("cost_price")} />
+                  <input type="number" min="1" value={p.qty} onChange={(e) => updPart(i, "qty", e.target.value)} className="h-9 rounded-xl border border-border bg-transparent px-2 text-xs tabular" placeholder={t("quantity")} />
+                  <input type="number" min="0" step="0.01" value={p.price} onChange={(e) => updPart(i, "price", e.target.value)} className="h-9 rounded-xl border border-border bg-transparent px-2 text-xs tabular" placeholder={t("cost_price")} />
                   <button type="button" onClick={() => rmPart(i)} className="h-9 w-9 rounded-md border border-border hover:bg-destructive/10"><Trash2 className="w-3.5 h-3.5" /></button>
                 </div>
               ))}
@@ -98,7 +98,7 @@ function MaintenanceForm({ initial, onClose, onSaved }) {
             <Field label={t("paid_amount")} type="number" testId="m-paid" value={form.paid_amount} onChange={(v) => setForm({ ...form, paid_amount: v })} />
             <div>
               <label className="text-xs font-medium mb-1.5 block">{t("status")}</label>
-              <select data-testid="m-status" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} className="w-full h-10 px-3 rounded-md border border-border bg-transparent text-sm">
+              <select data-testid="m-status" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} className="w-full h-10 px-3 rounded-xl border border-border bg-transparent text-sm">
                 <option value="in_progress">{t("in_progress")}</option>
                 <option value="completed">{t("completed")}</option>
                 <option value="delivered">{t("delivered")}</option>
@@ -108,8 +108,8 @@ function MaintenanceForm({ initial, onClose, onSaved }) {
           </div>
 
           <div className="flex items-center justify-end gap-2 pt-4 border-t border-border">
-            <button type="button" onClick={onClose} className="px-4 h-9 rounded-md border border-border text-sm">{t("cancel")}</button>
-            <button type="submit" disabled={saving} data-testid="m-submit" className="px-4 h-9 rounded-md bg-foreground text-background text-sm font-medium">{saving ? t("loading") : t("save")}</button>
+            <button type="button" onClick={onClose} className="px-4 h-9 rounded-xl border border-border text-sm">{t("cancel")}</button>
+            <button type="submit" disabled={saving} data-testid="m-submit" className="px-4 h-9 rounded-xl bg-primary text-primary-foreground text-sm font-medium">{saving ? t("loading") : t("save")}</button>
           </div>
         </form>
       </div>
@@ -121,7 +121,7 @@ function Field({ label, testId, type = "text", value, onChange, required }) {
   return (
     <div>
       <label className="text-xs font-medium mb-1.5 block">{label}</label>
-      <input data-testid={testId} type={type} required={required} value={value ?? ""} onChange={(e) => onChange(e.target.value)} className="w-full h-10 px-3 rounded-md border border-border bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20" />
+      <input data-testid={testId} type={type} required={required} value={value ?? ""} onChange={(e) => onChange(e.target.value)} className="w-full h-10 px-3 rounded-xl border border-border bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20" />
     </div>
   );
 }
@@ -141,10 +141,10 @@ function PayModal({ mid, onClose, onSaved }) {
       <div className="bg-card border border-border rounded-lg w-full max-w-sm p-5" onClick={(e) => e.stopPropagation()} data-testid="pay-modal">
         <h3 className="font-semibold mb-4">{t("payment")}</h3>
         <form onSubmit={submit}>
-          <input data-testid="pay-amount" autoFocus required type="number" min="0" step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder={t("enter_amount")} className="w-full h-10 px-3 rounded-md border border-border bg-transparent text-sm mb-3" />
+          <input data-testid="pay-amount" autoFocus required type="number" min="0" step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder={t("enter_amount")} className="w-full h-10 px-3 rounded-xl border border-border bg-transparent text-sm mb-3" />
           <div className="flex gap-2">
-            <button type="button" onClick={onClose} className="flex-1 h-9 rounded-md border border-border text-sm">{t("cancel")}</button>
-            <button type="submit" data-testid="pay-submit" className="flex-1 h-9 rounded-md bg-foreground text-background text-sm font-medium">{t("pay")}</button>
+            <button type="button" onClick={onClose} className="flex-1 h-9 rounded-xl border border-border text-sm">{t("cancel")}</button>
+            <button type="submit" data-testid="pay-submit" className="flex-1 h-9 rounded-xl bg-primary text-primary-foreground text-sm font-medium">{t("pay")}</button>
           </div>
         </form>
       </div>
@@ -211,7 +211,7 @@ export default function Maintenance() {
     <div className="space-y-5">
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <h1 className="text-3xl font-semibold tracking-tight">{t("maintenance")}</h1>
-        <button onClick={() => setEditing({})} data-testid="add-maintenance-btn" className="inline-flex items-center gap-2 h-9 px-4 rounded-md bg-foreground text-background text-sm font-medium active:scale-[0.98]">
+        <button onClick={() => setEditing({})} data-testid="add-maintenance-btn" className="inline-flex items-center gap-2 h-9 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-medium active:scale-[0.98]">
           <Plus className="w-4 h-4" /> {t("add_maintenance")}
         </button>
       </div>
@@ -219,9 +219,9 @@ export default function Maintenance() {
       <div className="flex items-center gap-3 flex-wrap">
         <div className="relative flex-1 min-w-[240px]">
           <Search className="w-4 h-4 absolute top-2.5 start-3 text-muted-foreground" />
-          <input data-testid="maint-search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("search")} className="w-full h-9 ps-9 pe-3 rounded-md border border-border bg-transparent text-sm" />
+          <input data-testid="maint-search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("search")} className="w-full h-9 ps-9 pe-3 rounded-xl border border-border bg-transparent text-sm" />
         </div>
-        <select data-testid="maint-status-filter" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="h-9 px-3 rounded-md border border-border bg-transparent text-sm">
+        <select data-testid="maint-status-filter" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="h-9 px-3 rounded-xl border border-border bg-transparent text-sm">
           <option value="">{t("all")}</option>
           <option value="in_progress">{t("in_progress")}</option>
           <option value="completed">{t("completed")}</option>

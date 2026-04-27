@@ -4,7 +4,6 @@ import { Toaster } from "sonner";
 import "@/App.css";
 import { AppProvider, useApp } from "@/contexts/AppContext";
 import Login from "@/pages/Login";
-import Register from "@/pages/Register";
 import Layout from "@/components/Layout";
 import Dashboard from "@/pages/Dashboard";
 import Maintenance from "@/pages/Maintenance";
@@ -19,7 +18,7 @@ function ProtectedRoute({ children }) {
   if (user === null) {
     return (
       <div className="min-h-screen flex items-center justify-center text-muted-foreground">
-        <div data-testid="auth-loading">...</div>
+        <div data-testid="auth-loading" className="w-6 h-6 border-2 border-border border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
@@ -37,7 +36,6 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
-      <Route path="/register" element={<AuthRoute><Register /></AuthRoute>} />
       <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
         <Route index element={<Dashboard />} />
         <Route path="maintenance" element={<Maintenance />} />
@@ -47,6 +45,7 @@ function AppRoutes() {
         <Route path="reports" element={<Reports />} />
         <Route path="settings" element={<Settings />} />
       </Route>
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

@@ -37,11 +37,11 @@ function DebtForm({ initial, onClose, onSaved }) {
           <Labeled label={t("due_date")} type="date" testId="d-due" value={form.due_date ? form.due_date.slice(0, 10) : ""} onChange={(v) => setForm({ ...form, due_date: v ? `${v}T00:00:00+00:00` : "" })} />
           <div>
             <label className="text-xs font-medium mb-1.5 block">{t("notes")}</label>
-            <textarea data-testid="d-notes" value={form.notes || ""} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="w-full min-h-[60px] px-3 py-2 rounded-md border border-border bg-transparent text-sm" />
+            <textarea data-testid="d-notes" value={form.notes || ""} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="w-full min-h-[60px] px-3 py-2 rounded-xl border border-border bg-transparent text-sm" />
           </div>
           <div className="flex justify-end gap-2 pt-2">
-            <button type="button" onClick={onClose} className="h-9 px-4 rounded-md border border-border text-sm">{t("cancel")}</button>
-            <button type="submit" data-testid="d-submit" disabled={saving} className="h-9 px-4 rounded-md bg-foreground text-background text-sm font-medium">{t("save")}</button>
+            <button type="button" onClick={onClose} className="h-9 px-4 rounded-xl border border-border text-sm">{t("cancel")}</button>
+            <button type="submit" data-testid="d-submit" disabled={saving} className="h-9 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-medium">{t("save")}</button>
           </div>
         </form>
       </div>
@@ -53,7 +53,7 @@ function Labeled({ label, testId, type = "text", value, onChange, required }) {
   return (
     <div>
       <label className="text-xs font-medium mb-1.5 block">{label}</label>
-      <input data-testid={testId} type={type} required={required} value={value ?? ""} onChange={(e) => onChange(e.target.value)} className="w-full h-10 px-3 rounded-md border border-border bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20" />
+      <input data-testid={testId} type={type} required={required} value={value ?? ""} onChange={(e) => onChange(e.target.value)} className="w-full h-10 px-3 rounded-xl border border-border bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20" />
     </div>
   );
 }
@@ -73,10 +73,10 @@ function PayDebt({ did, onClose, onSaved }) {
       <div className="bg-card border border-border rounded-lg w-full max-w-sm p-5" onClick={(e) => e.stopPropagation()} data-testid="pay-debt-modal">
         <h3 className="font-semibold mb-4">{t("settle")}</h3>
         <form onSubmit={submit}>
-          <input data-testid="pay-debt-amount" autoFocus required type="number" min="0" step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder={t("enter_amount")} className="w-full h-10 px-3 rounded-md border border-border bg-transparent text-sm mb-3" />
+          <input data-testid="pay-debt-amount" autoFocus required type="number" min="0" step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder={t("enter_amount")} className="w-full h-10 px-3 rounded-xl border border-border bg-transparent text-sm mb-3" />
           <div className="flex gap-2">
-            <button type="button" onClick={onClose} className="flex-1 h-9 rounded-md border border-border text-sm">{t("cancel")}</button>
-            <button type="submit" data-testid="pay-debt-submit" className="flex-1 h-9 rounded-md bg-foreground text-background text-sm font-medium">{t("pay")}</button>
+            <button type="button" onClick={onClose} className="flex-1 h-9 rounded-xl border border-border text-sm">{t("cancel")}</button>
+            <button type="submit" data-testid="pay-debt-submit" className="flex-1 h-9 rounded-xl bg-primary text-primary-foreground text-sm font-medium">{t("pay")}</button>
           </div>
         </form>
       </div>
@@ -119,7 +119,7 @@ export default function Debts() {
     <div className="space-y-5">
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <h1 className="text-3xl font-semibold tracking-tight">{t("debts")}</h1>
-        <button onClick={() => setEditing({})} data-testid="add-debt-btn" className="inline-flex items-center gap-2 h-9 px-4 rounded-md bg-foreground text-background text-sm font-medium">
+        <button onClick={() => setEditing({})} data-testid="add-debt-btn" className="inline-flex items-center gap-2 h-9 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-medium">
           <Plus className="w-4 h-4" /> {t("add_debt")}
         </button>
       </div>
@@ -127,9 +127,9 @@ export default function Debts() {
       <div className="flex items-center gap-3 flex-wrap">
         <div className="relative flex-1 min-w-[240px]">
           <Search className="w-4 h-4 absolute top-2.5 start-3 text-muted-foreground" />
-          <input data-testid="debt-search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("search")} className="w-full h-9 ps-9 pe-3 rounded-md border border-border bg-transparent text-sm" />
+          <input data-testid="debt-search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("search")} className="w-full h-9 ps-9 pe-3 rounded-xl border border-border bg-transparent text-sm" />
         </div>
-        <select data-testid="debt-status" value={status} onChange={(e) => setStatus(e.target.value)} className="h-9 px-3 rounded-md border border-border bg-transparent text-sm">
+        <select data-testid="debt-status" value={status} onChange={(e) => setStatus(e.target.value)} className="h-9 px-3 rounded-xl border border-border bg-transparent text-sm">
           <option value="">{t("all")}</option>
           <option value="open">{t("in_progress")}</option>
           <option value="partially_paid">{t("paid")}</option>

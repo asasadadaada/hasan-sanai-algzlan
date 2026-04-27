@@ -51,7 +51,7 @@ function PartForm({ initial, onClose, onSaved }) {
             <L label={t("part_name")} testId="p-name" required value={form.name} onChange={(v) => setForm({ ...form, name: v })} />
             <div>
               <label className="text-xs font-medium mb-1.5 block">{t("status")}</label>
-              <select data-testid="p-type" value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} className="w-full h-10 px-3 rounded-md border border-border bg-transparent text-sm">
+              <select data-testid="p-type" value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} className="w-full h-10 px-3 rounded-xl border border-border bg-transparent text-sm">
                 <option value="original">{t("type_original")}</option>
                 <option value="copy">{t("type_copy")}</option>
               </select>
@@ -66,8 +66,8 @@ function PartForm({ initial, onClose, onSaved }) {
           <div>
             <label className="text-xs font-medium mb-1.5 block">{t("compatible")}</label>
             <div className="flex gap-2 mb-2">
-              <input data-testid="p-compat-input" value={compatInput} onChange={(e) => setCompatInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addCompat(); } }} placeholder="iPhone 13, 13 Pro..." className="flex-1 h-9 px-3 rounded-md border border-border bg-transparent text-sm" />
-              <button type="button" onClick={addCompat} data-testid="p-compat-add" className="h-9 px-3 rounded-md border border-border text-xs">+</button>
+              <input data-testid="p-compat-input" value={compatInput} onChange={(e) => setCompatInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addCompat(); } }} placeholder="iPhone 13, 13 Pro..." className="flex-1 h-9 px-3 rounded-xl border border-border bg-transparent text-sm" />
+              <button type="button" onClick={addCompat} data-testid="p-compat-add" className="h-9 px-3 rounded-xl border border-border text-xs">+</button>
             </div>
             <div className="flex flex-wrap gap-1">
               {(form.compatible_devices || []).map((d, i) => (
@@ -80,11 +80,11 @@ function PartForm({ initial, onClose, onSaved }) {
           </div>
           <div>
             <label className="text-xs font-medium mb-1.5 block">{t("notes")}</label>
-            <textarea data-testid="p-notes" value={form.notes || ""} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="w-full min-h-[60px] px-3 py-2 rounded-md border border-border bg-transparent text-sm" />
+            <textarea data-testid="p-notes" value={form.notes || ""} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="w-full min-h-[60px] px-3 py-2 rounded-xl border border-border bg-transparent text-sm" />
           </div>
           <div className="flex justify-end gap-2 pt-2">
-            <button type="button" onClick={onClose} className="h-9 px-4 rounded-md border border-border text-sm">{t("cancel")}</button>
-            <button type="submit" data-testid="p-submit" disabled={saving} className="h-9 px-4 rounded-md bg-foreground text-background text-sm font-medium">{t("save")}</button>
+            <button type="button" onClick={onClose} className="h-9 px-4 rounded-xl border border-border text-sm">{t("cancel")}</button>
+            <button type="submit" data-testid="p-submit" disabled={saving} className="h-9 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-medium">{t("save")}</button>
           </div>
         </form>
       </div>
@@ -96,7 +96,7 @@ function L({ label, testId, type = "text", value, onChange, required }) {
   return (
     <div>
       <label className="text-xs font-medium mb-1.5 block">{label}</label>
-      <input data-testid={testId} type={type} required={required} value={value ?? ""} onChange={(e) => onChange(e.target.value)} className="w-full h-10 px-3 rounded-md border border-border bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20" />
+      <input data-testid={testId} type={type} required={required} value={value ?? ""} onChange={(e) => onChange(e.target.value)} className="w-full h-10 px-3 rounded-xl border border-border bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-foreground/20" />
     </div>
   );
 }
@@ -133,13 +133,13 @@ export default function SpareParts() {
     <div className="space-y-5">
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <h1 className="text-3xl font-semibold tracking-tight">{t("spare_parts")}</h1>
-        <button onClick={() => setEditing({})} data-testid="add-part-btn" className="inline-flex items-center gap-2 h-9 px-4 rounded-md bg-foreground text-background text-sm font-medium">
+        <button onClick={() => setEditing({})} data-testid="add-part-btn" className="inline-flex items-center gap-2 h-9 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-medium">
           <Plus className="w-4 h-4" /> {t("add_part")}
         </button>
       </div>
       <div className="relative max-w-md">
         <Search className="w-4 h-4 absolute top-2.5 start-3 text-muted-foreground" />
-        <input data-testid="parts-search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("search")} className="w-full h-9 ps-9 pe-3 rounded-md border border-border bg-transparent text-sm" />
+        <input data-testid="parts-search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("search")} className="w-full h-9 ps-9 pe-3 rounded-xl border border-border bg-transparent text-sm" />
       </div>
       <div className="swiss-card overflow-x-auto">
         <table className="data-table">

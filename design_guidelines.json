@@ -1,0 +1,112 @@
+{
+  "project_name": "Phone Repair Shop Enterprise SaaS",
+  "theme": "Light & Dark Toggle (Default: Light)",
+  "archetype": "Archetype 4 (Swiss & High-Contrast)",
+  "design_philosophy": "Enterprise-grade, Stripe-inspired high-contrast borders, Notion-inspired typography clarity. Professional, dense, and highly functional control-room feel. Full RTL support.",
+  "colors": {
+    "light": {
+      "background": "#FFFFFF",
+      "surface": "#F9FAFB",
+      "primary": "#000000",
+      "primary_foreground": "#FFFFFF",
+      "accent": "#2563EB",
+      "border": "#E5E7EB",
+      "text_main": "#111827",
+      "text_muted": "#6B7280",
+      "success": "#16A34A",
+      "warning": "#F59E0B",
+      "error": "#DC2626",
+      "whatsapp": "#25D366",
+      "telegram": "#229ED9"
+    },
+    "dark": {
+      "background": "#09090B",
+      "surface": "#18181B",
+      "primary": "#FFFFFF",
+      "primary_foreground": "#000000",
+      "accent": "#3B82F6",
+      "border": "#27272A",
+      "text_main": "#F9FAFB",
+      "text_muted": "#A1A1AA",
+      "success": "#22C55E",
+      "warning": "#FBBF24",
+      "error": "#EF4444",
+      "whatsapp": "#25D366",
+      "telegram": "#229ED9"
+    }
+  },
+  "typography": {
+    "font_family_heading": "'IBM Plex Sans Arabic', sans-serif",
+    "font_family_body": "'IBM Plex Sans Arabic', sans-serif",
+    "google_fonts_import": "@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap');",
+    "hierarchy": {
+      "h1": "text-3xl md:text-4xl font-semibold tracking-tight",
+      "h2": "text-2xl md:text-3xl font-semibold tracking-tight",
+      "h3": "text-xl font-medium tracking-tight",
+      "h4": "text-lg font-medium",
+      "body": "text-base leading-relaxed",
+      "small": "text-sm text-muted-foreground",
+      "overline": "text-xs font-semibold uppercase tracking-[0.2em]"
+    }
+  },
+  "layout_and_spacing": {
+    "sidebar": "fixed top-0 right-0 w-64 h-screen border-s border-border bg-surface flex flex-col z-40 (Note: right-0 is used because of RTL)",
+    "main_content": "min-h-screen bg-background text-text_main transition-colors duration-200 lg:pe-64 w-full flex flex-col",
+    "grid_system": "Control Room Grid (Mode B) - Dense bento layouts: grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6",
+    "cards": "bg-background border border-border rounded-lg shadow-sm overflow-hidden",
+    "padding": "Generous inner padding for cards: p-6",
+    "alignment": "RTL Native - Use logical properties like text-start, text-end, ms-*, me-*, ps-*, pe-*"
+  },
+  "components": {
+    "buttons": "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2",
+    "inputs": "flex h-9 w-full rounded-md border border-border bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
+    "tables": "w-full caption-bottom text-sm text-start. Header border-b border-border. Rows hover:bg-surface transition-colors data-testid required",
+    "badges": "inline-flex items-center rounded-full border border-border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+    "testing": "MUST add data-testid to all interactive components"
+  },
+  "media": {
+    "login_background_light": {
+      "url": "https://images.pexels.com/photos/12732218/pexels-photo-12732218.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "description": "Abstract white geometric shapes for light mode login background",
+      "category": "hero_background"
+    },
+    "login_background_dark": {
+      "url": "https://images.pexels.com/photos/36066388/pexels-photo-36066388.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "description": "Dark geometric forms in dramatic lighting for dark mode login",
+      "category": "hero_background"
+    },
+    "empty_state_illustration": {
+      "url": "https://images.pexels.com/photos/31862950/pexels-photo-31862950.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "description": "Close-up of disassembled smartphone parts for empty state or onboarding illustration",
+      "category": "empty_state"
+    }
+  },
+  "icons": {
+    "library": "lucide-react",
+    "stroke_width": "1.5",
+    "size": "w-5 h-5",
+    "rtl_behavior": "Mirror directional icons (arrows, chevrons) with 'transform scale-x-[-1]'"
+  },
+  "motion": {
+    "hover": "transition-colors duration-200 ease-in-out",
+    "micro_interactions": "active:scale-[0.98] on buttons",
+    "accessibility": "respect prefers-reduced-motion"
+  },
+  "accessibility": {
+    "testing_attributes": "All interactive elements MUST have data-testid attributes (e.g., data-testid='submit-btn')",
+    "contrast": "Ensure WCAG AA compliance. Dark mode borders must be visible (#27272A).",
+    "focus": "focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
+  },
+  "instructions_to_main_agent": [
+    "1. Setup RTL properly: Add `dir='rtl'` to the `<html>` tag in index.html.",
+    "2. Use Logical CSS Properties: ALWAYS use Tailwind's logical properties (ps-*, pe-*, ms-*, me-*, border-s, border-e, text-start, text-end) instead of pl-*, pr-*, etc. This ensures perfect LTR/RTL flipping.",
+    "3. Sidebar placement: Due to RTL, fix the sidebar to the right. Main content should have a padding/margin-end (`pe-64` or `me-64`) instead of margin-left to avoid overlap.",
+    "4. Typography: Import 'IBM Plex Sans Arabic' in the main CSS file and configure Tailwind to use it as the primary sans font.",
+    "5. Use .js/.jsx files only, NO TypeScript.",
+    "6. Apply a high-contrast 'Swiss' aesthetic: Avoid soft shadows. Rely on crisp 1px borders for cards and tables. Background should be stark white (light mode) or deep obsidian (dark mode).",
+    "7. Data Density: Dashboards should use tight spacing (Control Room Grid) to display lots of information (Debts, Maintenance tickets, Inventory).",
+    "8. Global Search: Implement a Command Palette style global search (Linear/Notion vibe) using Shadcn's Command component.",
+    "9. Use Lucide icons. Remember to apply `scale-x-[-1]` or use standard directional classes for icons that need mirroring in RTL (like back/forward arrows).",
+    "10. MUST include `data-testid` on all buttons, links, inputs, and forms to ensure testing reliability."
+  ]
+}

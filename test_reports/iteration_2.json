@@ -1,0 +1,54 @@
+{
+  "summary": "Backend regression after username-based-auth migration: 30/30 pytest tests pass against public REACT_APP_BACKEND_URL. Verified: username login (admin/Admin@2026) returns tenant_name='مركز ام الكبر والغزلان' with httpOnly+Secure cookies; /api/auth/register is REMOVED (404); /api/auth/me returns username (no email); change-username + change-password (with wrong/correct current_password, login with new credentials, old credentials revoked); username regex rejects 'a','ab','has@sign'; profile name update; staff user creation via /api/auth/users with {username,name,password,role}; list /api/auth/users returns username and never password_hash; RBAC denials for staff (403); customers/spare-parts/maintenance/debts/dashboard/settings/invoices all green. Brute-force lockout NOW correctly fires at attempt #6 (was BROKEN in iteration_1) — keying changed from per-pod-IP to per-username.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {
+        "endpoint": "POST /api/auth/me/change-password",
+        "issue": "Pydantic enforces new_password min_length=6, but does NOT enforce mixed case/digit/symbol — a user could reset to 'aaaaaa'. Consider stronger policy or bind to ADMIN_PASSWORD complexity rules."
+      },
+      {
+        "endpoint": "POST /api/auth/me/change-password",
+        "issue": "Endpoint does NOT rotate cookies after password change. Existing session cookies remain valid for full 15-min/7-day window. Recommendation: call set_auth_cookies(response, ...) with a fresh access+refresh token (and consider invalidating other sessions via a token version field on the user)."
+      },
+      {
+        "endpoint": "POST /api/auth/me/change-username",
+        "issue": "Same as above — JWT 'sub' is user.id (immutable) so existing tokens stay valid which is fine, but no audit/cookie rotation is forced. Audit log IS written (good)."
+      },
+      {
+        "endpoint": "POST /api/auth/login",
+        "issue": "Lockout key 'user:<username>' is global (not per-IP). A malicious user can lock out a legit account by spamming 5 bad passwords. Acceptable for a small B2B SaaS but worth flagging — consider combining IP + username with XFF, or implementing exponential backoff per-IP only."
+      }
+    ]
+  },
+  "frontend_issues": { "ui_bugs": [], "integration_issues": [], "design_issues": [] },
+  "test_report_links": [
+    "/app/backend/tests/test_repairshop_backend.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "(Optional) Rotate auth cookies after /me/change-password and add a token-version field for global session invalidation.",
+    "(Optional) Tighten password policy in ChangePasswordReq beyond min_length=6.",
+    "(Optional) Re-introduce IP component in brute-force key (using X-Forwarded-For first hop) so a third party can't lock out other tenants' admins by username."
+  ],
+  "critical_code_review_comments": [
+    "auth.py:140 — `if new_username == current.get('username'): return {'ok': True}` short-circuits BEFORE verifying current_password. Low impact (no state change) but inconsistent with the rest of the flow. Either verify password first or document.",
+    "auth.py:189 create_user does not check `req.username == current['username']` collision against staff invites; relies on unique-username find_one — fine, just note that the unique check happens AFTER role validation, so a duplicate username with role='owner' returns 400 'Role must be manager or staff' (misleading error). Validate role first OK, but consider clearer error ordering.",
+    "auth.py:209 `_sanitize(doc)` is called WITHOUT tenant_name in create_user response → frontend will get `tenant_name: null` for newly-invited users; minor UX inconsistency vs login/me.",
+    "auth.py:177 update_profile only allows name change. Original spec said 'change username/password/profile name' on Settings → Account — covered by the dedicated endpoints, OK.",
+    "models.py — `email: Optional[str] = None`. Schema migration left old admin docs with email field; new admin doc has none. Confirm db.users index `email_1` was actually dropped on startup (server.py claim) — could not verify from outside; if old unique index lingers, second user creation with email=None will fail. Tests pass because no email is sent.",
+    "Brute-force lockout key 'user:<username>' (good — fixed from iter_1). But 5 bad attempts -> 15-min lock per username allows trivial denial-of-service against `admin`. Consider per-IP+username pair or sliding-window decay."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_repairshop_backend.py (rewritten for username auth, added profile/change-username/change-password tests, removed /register tests, added register-removed-404 assertion)",
+    "/app/memory/test_credentials.md (updated to username='admin', tenant 'مركز ام الكبر والغزلان', removed /register reference)"
+  ],
+  "success_rate": { "backend": "100% (30/30)", "frontend": "not tested (backend-only request)" },
+  "test_credentials": "username: admin / password: Admin@2026 (seeded owner, tenant: مركز ام الكبر والغزلان). Tests revert all admin mutations (username/password/name) at the end of each test.",
+  "seed_data_creation": "TEST_-prefixed customers/parts/maintenance created and explicitly cleaned up where possible. A few TEST_M_Cust customer records and the TEST_Battery part may persist (used across class fixtures); harmless and tenant-isolated.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Re-run `pytest /app/backend/tests/test_repairshop_backend.py -v`. All auth flows now use {username, password}. /api/auth/register MUST stay 404. If main agent ever re-introduces email, update TestAuth.test_login_username_success_sets_httpOnly_cookies to relax the 'email-not-required' assertion. Brute-force lockout test (test_brute_force_lockout_per_username) uses a unique random username so it won't lock out admin. If running back-to-back fast, login_attempts collection may accumulate stale rows — clean with `db.login_attempts.delete_many({\"identifier\": {\"$regex\": \"^user:nouser_\"}})` if needed.",
+  "rca of the issue": "N/A — no failures this iteration. Previous iteration's brute-force lockout bug (per-pod IP keying) is now FIXED: auth.py uses key `user:<username>` so the counter is consistent across ingress pods. Verified: 6 wrong-password attempts against a fresh username return 401,401,401,401,401,429."
+}

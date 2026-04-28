@@ -169,10 +169,10 @@ export default function SpareParts() {
                 <td>
                   <div className="flex justify-end gap-1">
                     {p.quantity > 0 && (
-                      <button onClick={() => use(p)} data-testid={`use-part-${p.id}`} title={t("use_part")} className="p-1.5 rounded-lg hover:bg-muted press transition-colors"><Minus className="w-4 h-4" /></button>
+                      <button onClick={() => use(p)} data-testid={`use-part-${p.id}`} data-tip={t("use_part")} className="action-btn action-btn-pay tip"><Minus className="w-4 h-4" /></button>
                     )}
-                    <button onClick={() => setEditing(p)} data-testid={`edit-part-${p.id}`} className="p-1.5 rounded-lg hover:bg-muted press transition-colors"><Edit className="w-4 h-4" /></button>
-                    <button onClick={() => del(p)} data-testid={`delete-part-${p.id}`} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive press transition-colors"><Trash2 className="w-4 h-4" /></button>
+                    <button onClick={() => setEditing(p)} data-testid={`edit-part-${p.id}`} data-tip={t("edit")} className="action-btn action-btn-edit tip"><Edit className="w-4 h-4" /></button>
+                    <button onClick={() => del(p)} data-testid={`delete-part-${p.id}`} data-tip={t("delete")} className="action-btn action-btn-delete tip"><Trash2 className="w-4 h-4" /></button>
                   </div>
                 </td>
               </tr>

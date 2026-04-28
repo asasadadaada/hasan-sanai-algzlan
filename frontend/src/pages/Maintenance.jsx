@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Plus, Search, Edit, Trash2, Printer, CheckCircle2, MessageCircle, DollarSign, X } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Printer, CheckCircle2, MessageCircle, DollarSign, X, User, Phone, Smartphone, FileText } from "lucide-react";
 import { toast } from "sonner";
-import { api, fmtMoney, buildWhatsappUrl, formatApiErrorDetail } from "@/lib/api";
+import { api, fmtMoney, formatApiErrorDetail } from "@/lib/api";
 import { useApp } from "@/contexts/AppContext";
+import WhatsAppPromptModal from "@/components/WhatsAppPromptModal";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -57,15 +58,18 @@ function MaintenanceForm({ initial, onClose, onSaved }) {
           <button onClick={onClose} data-testid="close-maintenance-form"><X className="w-4 h-4" /></button>
         </div>
         <form onSubmit={submit} className="p-5 space-y-3">
-          <div className="grid grid-cols-2 gap-3">
-            <Field label={t("customer_name")} testId="m-cust-name" required value={form.customer_name} onChange={(v) => setForm({ ...form, customer_name: v })} />
-            <Field label={t("customer_phone")} testId="m-cust-phone" required value={form.customer_phone} onChange={(v) => setForm({ ...form, customer_phone: v })} />
-            <Field label={t("device_type")} testId="m-device-type" required value={form.device_type} onChange={(v) => setForm({ ...form, device_type: v })} />
-            <Field label={t("device_model")} testId="m-device-model" value={form.device_model} onChange={(v) => setForm({ ...form, device_model: v })} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <Field label={t("customer_name")} testId="m-cust-name" icon={User} required value={form.customer_name} onChange={(v) => setForm({ ...form, customer_name: v })} />
+            <Field label={t("customer_phone")} testId="m-cust-phone" icon={Phone} required value={form.customer_phone} onChange={(v) => setForm({ ...form, customer_phone: v })} />
+            <Field label={t("device_type")} testId="m-device-type" icon={Smartphone} required value={form.device_type} onChange={(v) => setForm({ ...form, device_type: v })} />
+            <Field label={t("device_model")} testId="m-device-model" icon={Smartphone} value={form.device_model} onChange={(v) => setForm({ ...form, device_model: v })} />
           </div>
           <div>
-            <label className="text-xs font-medium mb-1.5 block">{t("issue")}</label>
-            <textarea data-testid="m-issue" required value={form.issue} onChange={(e) => setForm({ ...form, issue: e.target.value })} className="premium-input" />
+            <label className="text-xs font-medium mb-1.5 block text-muted-foreground">{t("issue")}</label>
+            <div className="relative">
+              <FileText className="w-4 h-4 absolute top-3 start-3.5 text-muted-foreground pointer-events-none" />
+              <textarea data-testid="m-issue" required value={form.issue} onChange={(e) => setForm({ ...form, issue: e.target.value })} className="premium-input ps-10" placeholder={t("issue")} />
+            </div>
           </div>
 
           <div>
@@ -117,11 +121,14 @@ function MaintenanceForm({ initial, onClose, onSaved }) {
   );
 }
 
-function Field({ label, testId, type = "text", value, onChange, required }) {
+function Field({ label, testId, type = "text", value, onChange, required, icon: Icon }) {
   return (
     <div>
-      <label className="text-xs font-medium mb-1.5 block">{label}</label>
-      <input data-testid={testId} type={type} required={required} value={value ?? ""} onChange={(e) => onChange(e.target.value)} className="premium-input" />
+      <label className="text-xs font-medium mb-1.5 block text-muted-foreground">{label}</label>
+      <div className="relative">
+        {Icon && <Icon className="w-4 h-4 absolute top-3.5 start-3.5 text-muted-foreground pointer-events-none" />}
+        <input data-testid={testId} type={type} required={required} value={value ?? ""} onChange={(e) => onChange(e.target.value)} className={`premium-input ${Icon ? "ps-10" : ""}`} />
+      </div>
     </div>
   );
 }
@@ -161,6 +168,7 @@ export default function Maintenance() {
   const [paying, setPaying] = useState(null);
   const [settings, setSettings] = useState({});
   const [loading, setLoading] = useState(true);
+  const [waPrompt, setWaPrompt] = useState(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -178,7 +186,7 @@ export default function Maintenance() {
 
   const del = async (m) => {
     if (!window.confirm(t("confirm_delete"))) return;
-    try { await api.delete(`/maintenance/${m.id}`); toast.success(t("saved")); fetchData(); }
+    try { await api.delete(`/maintenance/${m.id}`); toast.success("تم الحذف بنجاح"); fetchData(); }
     catch (e) { toast.error(formatApiErrorDetail(e.response?.data?.detail)); }
   };
 
@@ -186,9 +194,14 @@ export default function Maintenance() {
     try {
       const { data } = await api.post(`/maintenance/${m.id}/complete`);
       fetchData();
-      const url = buildWhatsappUrl(data.whatsapp_phone, data.whatsapp_message);
-      window.open(url, "_blank");
-      toast.success(t("saved"));
+      toast.success("تم تسليم الصيانة");
+      setWaPrompt({
+        phone: data.whatsapp_phone,
+        message: data.whatsapp_message,
+        customerName: m.customer_name,
+        title: "تم التسليم — هل ترغب بإرسال رسالة للزبون؟",
+        subtitle: "اضغط زر الإرسال لفتح WhatsApp مباشرة",
+      });
     } catch (e) { toast.error(formatApiErrorDetail(e.response?.data?.detail)); }
   };
 
@@ -196,8 +209,14 @@ export default function Maintenance() {
     try {
       const { data } = await api.post(`/maintenance/${m.id}/followup-sent`);
       fetchData();
-      const url = buildWhatsappUrl(data.whatsapp_phone, data.whatsapp_message);
-      window.open(url, "_blank");
+      toast.success("تم تسجيل المتابعة");
+      setWaPrompt({
+        phone: data.whatsapp_phone,
+        message: data.whatsapp_message,
+        customerName: m.customer_name,
+        title: "متابعة الزبون",
+        subtitle: "إرسال رسالة متابعة بعد الصيانة",
+      });
     } catch (e) { toast.error(formatApiErrorDetail(e.response?.data?.detail)); }
   };
 
@@ -262,17 +281,17 @@ export default function Maintenance() {
                 <td>
                   <div className="flex items-center justify-end gap-1">
                     {m.debt_amount > 0 && (
-                      <button title={t("pay")} onClick={() => setPaying(m.id)} data-testid={`pay-${m.id}`} className="p-1.5 rounded-lg hover:bg-muted press transition-colors"><DollarSign className="w-4 h-4" /></button>
+                      <button data-tip={t("pay")} onClick={() => setPaying(m.id)} data-testid={`pay-${m.id}`} className="action-btn action-btn-pay tip"><DollarSign className="w-4 h-4" /></button>
                     )}
                     {(m.status === "in_progress" || m.status === "completed") && (
-                      <button title={t("mark_complete")} onClick={() => complete(m)} data-testid={`complete-${m.id}`} className="p-1.5 rounded hover:bg-muted text-[hsl(var(--whatsapp))]"><CheckCircle2 className="w-4 h-4" /></button>
+                      <button data-tip={t("mark_complete")} onClick={() => complete(m)} data-testid={`complete-${m.id}`} className="action-btn action-btn-success tip"><CheckCircle2 className="w-4 h-4" /></button>
                     )}
                     {m.status === "delivered" && !m.follow_up_sent && (
-                      <button title={t("send_followup")} onClick={() => sendFollowup(m)} data-testid={`followup-${m.id}`} className="p-1.5 rounded hover:bg-muted text-[hsl(var(--whatsapp))]"><MessageCircle className="w-4 h-4" /></button>
+                      <button data-tip={t("send_followup")} onClick={() => sendFollowup(m)} data-testid={`followup-${m.id}`} className="action-btn action-btn-success tip"><MessageCircle className="w-4 h-4" /></button>
                     )}
-                    <button title={t("print")} onClick={() => printInvoice(m)} data-testid={`print-${m.id}`} className="p-1.5 rounded-lg hover:bg-muted press transition-colors"><Printer className="w-4 h-4" /></button>
-                    <button title={t("edit")} onClick={() => setEditing(m)} data-testid={`edit-${m.id}`} className="p-1.5 rounded-lg hover:bg-muted press transition-colors"><Edit className="w-4 h-4" /></button>
-                    <button title={t("delete")} onClick={() => del(m)} data-testid={`delete-${m.id}`} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive press transition-colors"><Trash2 className="w-4 h-4" /></button>
+                    <button data-tip={t("print")} onClick={() => printInvoice(m)} data-testid={`print-${m.id}`} className="action-btn action-btn-neutral tip"><Printer className="w-4 h-4" /></button>
+                    <button data-tip={t("edit")} onClick={() => setEditing(m)} data-testid={`edit-${m.id}`} className="action-btn action-btn-edit tip"><Edit className="w-4 h-4" /></button>
+                    <button data-tip={t("delete")} onClick={() => del(m)} data-testid={`delete-${m.id}`} className="action-btn action-btn-delete tip"><Trash2 className="w-4 h-4" /></button>
                   </div>
                 </td>
               </tr>
@@ -283,6 +302,15 @@ export default function Maintenance() {
 
       {editing && <MaintenanceForm initial={editing.id ? editing : null} onClose={() => setEditing(null)} onSaved={fetchData} />}
       {paying && <PayModal mid={paying} onClose={() => setPaying(null)} onSaved={fetchData} />}
+      <WhatsAppPromptModal
+        open={!!waPrompt}
+        phone={waPrompt?.phone}
+        message={waPrompt?.message}
+        customerName={waPrompt?.customerName}
+        title={waPrompt?.title}
+        subtitle={waPrompt?.subtitle}
+        onClose={() => setWaPrompt(null)}
+      />
     </div>
   );
 }

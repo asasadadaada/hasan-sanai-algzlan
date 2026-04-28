@@ -98,8 +98,8 @@ export default function Customers() {
                 <td className="text-xs text-muted-foreground max-w-[220px] truncate">{c.notes || "—"}</td>
                 <td>
                   <div className="flex justify-end gap-1">
-                    <button onClick={() => setEditing(c)} data-testid={`edit-customer-${c.id}`} className="p-1.5 rounded-lg hover:bg-muted press transition-colors"><Edit className="w-4 h-4" /></button>
-                    <button onClick={() => del(c)} data-testid={`delete-customer-${c.id}`} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive press transition-colors"><Trash2 className="w-4 h-4" /></button>
+                    <button onClick={() => setEditing(c)} data-testid={`edit-customer-${c.id}`} data-tip={t("edit")} className="action-btn action-btn-edit tip"><Edit className="w-4 h-4" /></button>
+                    <button onClick={() => del(c)} data-testid={`delete-customer-${c.id}`} data-tip={t("delete")} className="action-btn action-btn-delete tip"><Trash2 className="w-4 h-4" /></button>
                   </div>
                 </td>
               </tr>

@@ -164,10 +164,10 @@ export default function Debts() {
                 <td>
                   <div className="flex items-center justify-end gap-1">
                     {d.amount_remaining > 0 && (
-                      <button onClick={() => setPaying(d.id)} data-testid={`pay-debt-${d.id}`} title={t("settle")} className="p-1.5 rounded-lg hover:bg-muted press transition-colors"><DollarSign className="w-4 h-4" /></button>
+                      <button onClick={() => setPaying(d.id)} data-testid={`pay-debt-${d.id}`} data-tip={t("settle")} className="action-btn action-btn-pay tip"><DollarSign className="w-4 h-4" /></button>
                     )}
-                    <button onClick={() => setEditing(d)} data-testid={`edit-debt-${d.id}`} title={t("edit")} className="p-1.5 rounded-lg hover:bg-muted press transition-colors"><Edit className="w-4 h-4" /></button>
-                    <button onClick={() => del(d)} data-testid={`delete-debt-${d.id}`} title={t("delete")} className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive press transition-colors"><Trash2 className="w-4 h-4" /></button>
+                    <button onClick={() => setEditing(d)} data-testid={`edit-debt-${d.id}`} data-tip={t("edit")} className="action-btn action-btn-edit tip"><Edit className="w-4 h-4" /></button>
+                    <button onClick={() => del(d)} data-testid={`delete-debt-${d.id}`} data-tip={t("delete")} className="action-btn action-btn-delete tip"><Trash2 className="w-4 h-4" /></button>
                   </div>
                 </td>
               </tr>

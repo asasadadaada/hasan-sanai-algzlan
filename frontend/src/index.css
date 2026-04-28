@@ -188,21 +188,57 @@ html, body {
   @apply w-full h-11 px-3.5 rounded-xl border border-border bg-background text-sm;
   box-shadow: var(--shadow-sm);
   outline: none;
-  transition: all 180ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition: border-color 180ms, box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1), background-color 180ms;
 }
-.premium-input.h-9 { height: 2.25rem; }
-.premium-input.h-10 { height: 2.5rem; }
-.premium-input.h-12 { height: 3rem; }
-.premium-input::placeholder { color: hsl(var(--muted-foreground)); opacity: 0.6; }
+.premium-input::placeholder { color: hsl(var(--muted-foreground)); opacity: 0.55; }
 .premium-input:hover { border-color: hsl(var(--muted-foreground) / 0.4); }
 .premium-input:focus {
   border-color: hsl(var(--primary));
   box-shadow: 0 0 0 4px hsl(var(--primary) / 0.12), var(--shadow-sm);
 }
 .premium-input:disabled { opacity: 0.5; cursor: not-allowed; }
+.premium-input.h-9 { height: 2.25rem; }
+.premium-input.h-10 { height: 2.5rem; }
+.premium-input.h-12 { height: 3rem; }
 
-textarea.premium-input { min-height: 72px; padding-top: 10px; padding-bottom: 10px; line-height: 1.5; }
+textarea.premium-input { min-height: 72px; padding-top: 10px; padding-bottom: 10px; line-height: 1.6; }
 select.premium-input { cursor: pointer; }
+
+/* Action icon-buttons with semantic colors */
+.action-btn {
+  @apply inline-flex items-center justify-center w-8 h-8 rounded-lg transition-all;
+}
+.action-btn:hover { transform: translateY(-1px); }
+.action-btn:active { transform: translateY(0) scale(0.92); }
+.action-btn-pay { @apply text-[hsl(160_84%_35%)] bg-[hsl(160_84%_39%)]/10 hover:bg-[hsl(160_84%_39%)]/20; }
+.action-btn-edit { @apply text-[hsl(217_91%_55%)] bg-[hsl(217_91%_60%)]/10 hover:bg-[hsl(217_91%_60%)]/20; }
+.action-btn-delete { @apply text-destructive bg-destructive/10 hover:bg-destructive/20; }
+.action-btn-neutral { @apply text-muted-foreground bg-muted hover:bg-muted-foreground/15; }
+.action-btn-success { @apply text-[hsl(var(--whatsapp))] bg-[hsl(var(--whatsapp))]/10 hover:bg-[hsl(var(--whatsapp))]/20; }
+.action-btn-info { @apply text-[hsl(var(--telegram))] bg-[hsl(var(--telegram))]/10 hover:bg-[hsl(var(--telegram))]/20; }
+
+/* CSS-only tooltip on hover */
+.tip { position: relative; }
+.tip[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  padding: 4px 8px;
+  background: hsl(var(--foreground));
+  color: hsl(var(--background));
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms, transform 150ms;
+  z-index: 50;
+  box-shadow: var(--shadow-md);
+}
+.tip:hover[data-tip]::after { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 /* Table */
 .data-table { @apply w-full text-sm; }

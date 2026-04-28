@@ -64,8 +64,8 @@ export default function Login() {
         <div className="bg-card/95 backdrop-blur-xl border border-white/10 rounded-3xl p-8 md:p-10" style={{ boxShadow: "0 25px 50px -12px rgb(0 0 0 / 0.5)" }}>
           {/* Logo */}
           <div className="flex flex-col items-center mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[hsl(226_64%_33%)] to-[hsl(217_91%_60%)] flex items-center justify-center mb-4 shadow-lg">
-              <Sparkles className="w-7 h-7 text-white" strokeWidth={2} />
+            <div className="w-28 h-28 md:w-32 md:h-32 rounded-3xl overflow-hidden ring-2 ring-primary/30 shadow-2xl shadow-primary/20 mb-5 bg-card">
+              <img src="/icons/brand-512.png" alt="مركز ام الكبر والغزلان" className="w-full h-full object-cover" />
             </div>
             <h1 className="text-xl md:text-2xl font-bold tracking-tight text-center">
               {lang === "ar" ? BRAND_AR : BRAND_EN}

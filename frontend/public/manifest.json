@@ -1,0 +1,32 @@
+{
+  "name": "مركز ام الكبر والغزلان",
+  "short_name": "ام الكبر والغزلان",
+  "description": "نظام إدارة الصيانة — مركز ام الكبر والغزلان",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a1a3f",
+  "theme_color": "#1e3a8a",
+  "orientation": "portrait",
+  "dir": "rtl",
+  "lang": "ar",
+  "icons": [
+    {
+      "src": "/icons/brand-192.png",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/brand-512.png",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/brand-512.png",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "maskable"
+    }
+  ]
+}

@@ -53,10 +53,10 @@ export default function Layout() {
 
   const SidebarContent = () => (
     <>
-      <div className="h-16 flex items-center justify-between px-5 border-b border-border">
+      <div className="h-auto min-h-16 flex items-center justify-between px-5 py-4 border-b border-border">
         <div className="flex items-center min-w-0">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[hsl(226_64%_33%)] to-[hsl(217_91%_60%)] flex items-center justify-center shadow-md flex-shrink-0">
-            <Sparkles className="w-4.5 h-4.5 text-white" strokeWidth={2} />
+          <div className="w-14 h-14 rounded-2xl overflow-hidden ring-2 ring-primary/20 shadow-md flex-shrink-0 bg-card">
+            <img src="/icons/brand-192.png" alt="مركز ام الكبر والغزلان" className="w-full h-full object-cover" />
           </div>
           <div className="ms-3 min-w-0">
             <div className="font-bold text-sm tracking-tight truncate max-w-[160px]" title={user?.tenant_name || ""}>
